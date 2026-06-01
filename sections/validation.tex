@@ -1,0 +1,406 @@
+\section{Validation}
+\label{sec:validation}
+
+We validate the three theorems on simulated data with known
+instance-level ground truth. The simulation is implemented in
+\texttt{scripts/sim.R} and \texttt{scripts/run.R}, fully reproducible
+from seeds \texttt{20260523} through \texttt{20260542} (twenty
+seeds). Every headline number below is reported as a median with
+inter-quartile range across seeds, so the reader can tell which
+quantities are stable point estimates and which are
+seed-dependent. Real-data application to MUSK1 and MUSK2 follows in
+\cref{sec:musk}.
+
+\subsection{Data-generating process}
+
+For $K$ instance types and $N$ bags, per-type positivity $\eta_k$ is
+fixed, bag size $|B_i| \sim \mathrm{Poisson}(\lambda)$, and the
+composition $\bm{m}_i$ is drawn by assigning each instance a type
+uniformly at random. Conditional on $\bm{m}_i$, latent instance
+labels $y_{ij} \sim \mathrm{Bernoulli}(\eta_{k(j)})$, and the bag
+label is set by the chosen aggregation rule (deterministic OR,
+noisy-OR, label-noise, or $r$-of-$n$). The estimator is the
+bag-OR maximum-likelihood fit of \cref{sec:identifiability},
+implemented in R as a box-constrained L-BFGS-B problem in
+$\bm{s} \geq 0$ with the analytic gradient
+$\partial_{s_k}\log L = \sum_i m_{ik}(Y_i - p_i)/p_i$ from
+\cref{thm:bag-total}.
+
+\subsection{Rank condition (\cref{thm:rank})}
+
+We compare three designs at $K = 5$,
+$\bm{\eta} = (0.05, 0.10, 0.20, 0.30, 0.50)$, $N = 600$ bags.
+
+\paragraph{Full-rank design.} Bag compositions are drawn uniformly
+across types. The composition matrix has $\mathrm{rank}(M) = 5$ on
+every seed, and the per-type recovery error has cross-seed median
+$\max_k|\hat\eta_k - \eta_k| = 0.088$ with IQR $[0.066, 0.107]$:
+the sampling-noise floor at this $N$.
+
+\paragraph{Rank-deficient design.} Types 1 and 2 are forced into the
+fixed co-occurrence $m_{i1} = 2 m_{i2}$ in every bag, so column 1 of
+$M$ equals twice column 2; types 3--5 vary independently. The
+composition matrix has $\mathrm{rank}(M) = 4$ on every seed, and
+only the linear functional $2 s_1 + s_2$ is identified. Across
+three optimizer starts that perturb the $(s_1, s_2)$ split,
+$\hat s_1$ varies by a median $0.060$ (IQR $[0.053, 0.060]$) while
+$2\hat s_1 + \hat s_2$ collapses to a spread with median
+$1.6\times 10^{-15}$ (IQR $[4\times 10^{-16}, 3\times 10^{-6}]$):
+machine precision in the bulk, with a small upper tail where
+optimizer-tolerance jitter dominates. The recovered combination
+across seeds has median $0.215$ (IQR $[0.158, 0.259]$), with truth
+$2 s_1^* + s_2^* = 0.208$. This is the empirical signature of the
+rank theorem: distinct $(s_1, s_2)$ pairs yield identical
+bag-label distributions, but the data-identified projection onto
+$\mathrm{col}(M)$ is recovered up to sampling noise.
+
+\paragraph{Singleton-bag augmentation.} Adding $20$ singleton bags
+per type to the rank-deficient design (each carrying a single
+instance whose Bernoulli label is observed directly) restores
+$\mathrm{rank}(M) = 5$ on every seed. The spread of $\hat s_1$
+across starts collapses by more than three orders of magnitude to
+median $4.8\times 10^{-5}$ (IQR $[3.5, 6.3]\times 10^{-5}$), and
+the per-type recovery error returns to the sampling-noise floor,
+median $0.088$ with IQR $[0.060, 0.100]$, comparable to the
+full-rank baseline. \Cref{fig:rank-collapse} visualises the
+collapse: under rank-deficiency, the fitted $(\hat s_1, \hat s_2)$
+pairs from three starts per seed scatter along the identified-combo
+ridge $2 s_1 + s_2 = 0.208$; singleton augmentation pins them to a
+tight cloud around the truth.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{fig_rank_collapse.pdf}
+\caption{Rank-collapse diagnostic. Each point is one
+$(\hat s_1, \hat s_2)$ from one of three optimizer starts on one of
+20 seeds. \textbf{Left}: rank-deficient design ($m_{i1} = 2 m_{i2}$
+in every bag); fits scatter along the dashed identified ridge
+$2 s_1 + s_2 = 0.208$, individual coordinates non-identified.
+\textbf{Right}: same design augmented with 20 singleton bags per
+type; fits collapse to a tight cluster around the truth (cross).}
+\label{fig:rank-collapse}
+\end{figure}
+
+\subsection{Bag-prevalence consistency (\cref{thm:bag-total})}
+
+We fit the bag-OR MLE on $30$ replicates per seed at $K = 4$,
+$\bm\eta = (0.05, 0.15, 0.30, 0.60)$, $N = 400$, and verify
+\eqref{eq:bag-total} numerically. Boundary maximizers (with at
+least one $\hat s_k$ on the lower bound) account for a median $7$
+of $30$ replicates per seed (IQR $[6, 9]$), with the rest being
+interior MLEs.
+
+\paragraph{Interior MLEs.} The infinity-norm of the IRLS-weighted
+residual $M^\top D^{-1}(\bm Y - \hat{\bm p})$ has cross-seed median
+$3.6\times 10^{-7}$ (IQR $[3.0, 4.6]\times 10^{-7}$), with the
+per-seed maximum at median $2.0\times 10^{-6}$ (IQR
+$[1.6, 2.8]\times 10^{-6}$): at optimizer tolerance, confirming the
+score equation \eqref{eq:bag-total}.
+
+\paragraph{Contrast with the unweighted residual.} On the same
+fits, the inf-norm of $M^\top(\bm Y - \hat{\bm p})$ has cross-seed
+median $4.66$ (IQR $[4.32, 4.93]$), with per-seed maximum at median
+$11.5$ (IQR $[10.3, 12.6]$): the unweighted moment-matching
+identity is \emph{not} satisfied, by seven orders of magnitude
+relative to the weighted form. This empirical contrast is the
+practical reason the cloglog-link non-canonicity in the remark
+following \cref{thm:bag-total} matters.
+
+\paragraph{Boundary MLEs.} Boundary replicates have weighted
+residuals of order $1$ to $30$ on the active coordinate, as the
+KKT conditions allow (the inactive sign constraint absorbs the
+remaining gradient). At interior maximizers the theorem holds; at
+boundary maximizers \eqref{eq:bag-total} reduces to a KKT
+inequality on the constrained coordinate.
+
+\subsection{Aggregation-rule bias (\cref{thm:bias-rule})}
+
+We sweep two of the three rules considered in \cref{sec:methodology}
+at $K = 4$, $N = 800$, $25$ replicates per cell per seed.
+
+\paragraph{Noisy-OR firing-rate confound.} Generating with firing
+rate $\rho \in \{1.0, 0.9, 0.7, 0.5\}$ and fitting the
+deterministic-OR model, the cross-seed median of the per-type
+ratio $\hat\eta_k / \eta_k$ tracks $\rho$ closely. At $\rho = 1.0$
+the four type-medians are $(0.99, 1.01, 1.01, 1.00)$; at
+$\rho = 0.9$ they are $(0.83, 0.89, 0.91, 0.91)$; at $\rho = 0.7$
+they are $(0.73, 0.69, 0.70, 0.70)$; and at $\rho = 0.5$ they are
+$(0.52, 0.51, 0.51, 0.50)$. \Cref{fig:firing-rate} plots the same
+trajectory: ratio collapses onto the identity line $y = \rho$ for
+every type, with IQR ribbons across seeds visible only near the
+boundary types. This is the firing-rate confound of
+\cref{rem:firing-rate}: the deterministic-OR estimator recovers
+$\rho\eta$, not $\eta$, when applied to noisy-OR data. The
+product is identified; the factors are not.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{fig_firing_rate.pdf}
+\caption{Firing-rate confound under noisy-OR data. Lines: median
+across 20 seeds of $\hat\eta_k / \eta_k$ for the deterministic-OR
+MLE applied to noisy-OR data at firing rate $\rho$; ribbons: IQR
+across seeds; dashed: identity $y = \rho$. The four instance types
+all collapse onto the identity, confirming that
+$\hat\eta \approx \rho\eta$: the deterministic-OR estimator
+recovers only the product.}
+\label{fig:firing-rate}
+\end{figure}
+
+\paragraph{Label noise.} Generating with symmetric flip rate
+$\epsilon \in \{0, 0.05, 0.10, 0.20\}$, the cross-seed median bias
+$\hat\eta_k - \eta_k$ grows monotonically with $\epsilon$, most
+sharply for the highest-$\eta$ type. The four type-medians at
+$\epsilon = 0$ are $(+0.001, +0.005, +0.000, -0.002)$ (sampling
+noise); at $\epsilon = 0.05$, $(+0.023, +0.001, -0.033, -0.104)$;
+at $\epsilon = 0.10$, $(+0.036, -0.001, -0.059, -0.187)$; and at
+$\epsilon = 0.20$, $(+0.055, -0.010, -0.102, -0.297)$. For the
+highest-$\eta$ type the bias is well-approximated as linear in
+$\epsilon$ at $\epsilon \leq 0.10$ (the first-order Taylor
+prediction of \eqref{eq:bias-rule}) and grows super-linearly at
+$\epsilon = 0.20$ where the second-order term becomes substantial.
+
+\subsection{Real-data application: MUSK1 and MUSK2}
+\label{sec:musk}
+
+We apply the framework to the founding MIL benchmark
+\citep{dietterich1997solving}: $92$ molecules in MUSK1 ($476$
+conformations) and $102$ molecules in MUSK2 ($6{,}598$
+conformations), with $166$-dimensional chemical descriptors per
+conformation and a binary musky/non-musky label per molecule.
+Conformations are the instances; molecules are the bags. We apply
+the discrete-type version of \cref{thm:rank} by z-scoring the $166$
+descriptors and clustering instances with $k$-means at $K = 20$
+(results at $K = 10$ are qualitatively similar; see
+\texttt{scripts/musk.R}); the continuous-feature version of
+\cref{sec:continuous} is reported alongside. The bag-by-type composition
+matrix $M$ is built from cluster assignments, and the bag-OR MLE
+of \cref{thm:bag-total} is fit. Code reproduces from
+\texttt{scripts/musk.R} (seed \texttt{20260527}).
+
+\paragraph{Rank-condition diagnostic.} The $K$-means composition
+matrix has $\mathrm{rank}(M) = 20$ for both MUSK1 (condition number
+$26$) and MUSK2 (condition number $93$). \Cref{thm:rank} therefore
+licenses identifiability of all per-type positivities from bag
+labels alone; the high MUSK2 condition number flags that the
+problem is well-posed but numerically delicate.
+
+\paragraph{Per-type positivity.} On MUSK1 the fitted $\hat\eta_k$
+range from $0.58$ (the most musky cluster) down to a tail of types
+at the lower bound $\hat s_k = 0$, with $11$ of $20$ types on the
+boundary, exactly the KKT regime characterised in
+\cref{thm:bag-total}. The interpretation is that those cluster IDs
+appear only in negative bags, so the bag-OR likelihood pushes their
+instance positivity to zero. On MUSK2 the boundary count is $17$ of
+$20$, reflecting the much larger ratio of conformations to
+positive molecules. \Cref{fig:musk-eta} plots the sorted
+$\hat\eta_k$ for both datasets, with boundary types shown in light
+grey.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{fig_musk_eta.pdf}
+\caption{MUSK per-instance-type positivity. Each bar is one
+$k$-means cluster of standardized $166$-dim conformation
+descriptors, sorted by fitted $\hat\eta_k$. Light bars mark
+boundary types ($\hat s_k = 0$) where the bag-OR MLE collapses to
+zero instance positivity. The long tail of boundary types is the
+KKT-regime signature of \cref{thm:bag-total} on real data.}
+\label{fig:musk-eta}
+\end{figure}
+
+\paragraph{Bag-prevalence consistency, real data.} The fitted
+bag-positive rate $\bar{\hat p}$ matches the observed bag-positive
+rate $\bar Y$ to $0.03$ on MUSK1 ($\bar{\hat p} = 0.49$ vs.
+$\bar Y = 0.51$) and to $0.13$ on MUSK2 ($0.25$ vs. $0.38$). The
+MUSK2 gap is the boundary-coordinate signature of
+\cref{thm:bag-total}: at the KKT optimum the column-space moment
+identity holds for interior coordinates, while the constrained
+coordinates carry a residual that the unweighted bag rate
+inherits.
+
+\paragraph{Bag-level prediction.} Under leave-one-bag-out
+cross-validation (a fresh $k$-means on each held-in fold), the
+bag-OR MLE achieves LOO AUC $0.79$ and accuracy $0.75$ on MUSK1, and
+LOO AUC $0.60$ on MUSK2. Published continuous-feature methods
+reach $\sim 0.87$ accuracy on MUSK1 \citep{andrews2003support} and
+$\sim 0.84$ on MUSK2 \citep{maron1998framework}. The gap is the
+cost of discretization: $k$-means on $166$-dimensional descriptors
+collapses fine chemical distinctions that the discrete-type
+theorem does not see. The continuous-feature version of
+\cref{thm:rank} (\cref{thm:rank-continuous}), in which $M$ is
+replaced by the bag-summed feature matrix $\Phi$, lifts the
+discretization constraint but at $d = 166 > N$ enters the
+under-identified regime; \cref{sec:musk-continuous} reports the
+empirical consequence.
+
+\paragraph{Comparison to published baselines.}
+\Cref{tab:musk-comparison} places the bag-OR MLE alongside the
+canonical MIL methods on MUSK. The discrete-type fit sits well
+below all continuous-feature methods on MUSK1 (LOO accuracy $0.75$
+vs $\geq 0.84$) and substantially below on MUSK2 (LOO AUC $0.60$).
+This is the expected discretization gap: \cref{thm:rank} as stated
+is for $K$ discrete types, $k$-means at $K = 20$ collapses
+chemical-descriptor variation, and the discrete-type
+identifiability machinery does not by itself supply a competitive
+predictor on continuous features. \Cref{sec:musk-continuous}
+reports the continuous-feature ($d = 166$) refit and shows that
+the gap is more nuanced than discretization alone: the
+identifiability diagnostic catches a second failure mode in the
+$d > N$ regime.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Method} & \textbf{MUSK1} & \textbf{MUSK2} \\
+\midrule
+iAPR \citep{dietterich1997solving}            & 0.92 LOO acc.  & 0.89 LOO acc. \\
+Diverse Density \citep{maron1998framework}    & 0.89 LOO acc.  & 0.82 LOO acc. \\
+MI-SVM \citep{andrews2003support}             & 0.87 10-CV acc.& 0.84 10-CV acc. \\
+mi-SVM \citep{andrews2003support}             & 0.78 10-CV acc.& 0.84 10-CV acc. \\
+\midrule
+Bag-OR MLE, $k$-means $K = 20$ (this paper)   & 0.75 LOO acc.  & 0.56 LOO acc. \\
+                                              & 0.79 LOO AUC   & 0.60 LOO AUC \\
+\bottomrule
+\end{tabular}
+\caption{MUSK benchmark accuracy. Published numbers are cited from
+the respective papers and use the evaluation protocol each paper
+reports (LOO molecule cross-validation for iAPR and Diverse
+Density; 10-fold CV for MI-SVM and mi-SVM). Bag-OR MLE results in
+the last row use leave-one-bag-out CV with a fresh $k$-means on
+each held-in fold. The gap is consistent with the
+discretization cost discussed in the prediction paragraph.}
+\label{tab:musk-comparison}
+\end{table}
+
+\paragraph{What the discrete-type application demonstrates.} The
+discrete-K results are not a competitive prediction benchmark.
+They show that (i) the rank-condition diagnostic computes cleanly
+on real chemical-descriptor data and rules out co-occurrence
+confound; (ii) the bag-prevalence consistency theorem produces the
+observed bag-rate to within the boundary-coordinate residual the
+theorem itself predicts; (iii) the interior-versus-boundary MLE
+classification from \cref{sec:validation}'s simulation survives the
+transition to real data; and (iv) the discrete-type framework's
+predictive ceiling on continuous-feature chemistry data is real
+and identifies the continuous-feature extension as the principled
+next step rather than a parameter-tuning exercise.
+
+\subsection{MUSK refit with continuous-feature \cref{thm:rank-continuous}}
+\label{sec:musk-continuous}
+
+We now refit MUSK with the continuous-feature version of the
+framework, applying \cref{thm:rank-continuous} to the same data.
+Each conformation's $166$-dim descriptor is min-max scaled per
+column to $[0, 1]$, yielding $\bm\phi(x) \in [0, 1]^{166}$, and the
+bag-summed feature matrix $\Phi = [\bm\Phi_1 \mid \cdots \mid
+\bm\Phi_N]^\top \in \R^{N \times 166}_{\geq 0}$ is the
+continuous-feature analogue of the discrete composition matrix
+$M$.
+
+\paragraph{Rank diagnostic (continuous).} For both MUSK1 ($N=92$)
+and MUSK2 ($N=102$), $d=166 > N$, so $\mathrm{rank}(\Phi) \leq N$
+by construction; the continuous parameter $\bm\beta$ is
+under-identified by at least $d - N$ dimensions
+(\cref{thm:rank-continuous}). Bag-level predictions, which depend
+on $\bm\beta$ only through the linear predictor $\Phi\bm\beta$,
+remain well-defined on the unidentified null space, and so does the
+LOO-CV evaluation.
+
+\paragraph{Bag-level prediction (continuous).} Under leave-one-bag-
+out CV with a fresh per-fold min-max scaling, the continuous-feature
+bag-OR MLE achieves the following on the same fold structure as
+\cref{sec:musk}'s discrete-K analysis:
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+                                                   & MUSK1                          & MUSK2 \\
+\midrule
+Discrete-type ($K = 20$)                           & \musonemkacc{} acc / \musonemkauc{} AUC  & \musttwomkacc{} acc / \musttwomkauc{} AUC \\
+Continuous-feature ($d = 166$)                     & \musonemcacc{} acc / \musonemcauc{} AUC  & \musttwomcacc{} acc / \musttwomcauc{} AUC \\
+Continuous-feature, PCA-to-$k=50$ (\cref{sec:musk-pca}) & \musonempcacc{} acc / \musonempcauc{} AUC & \musttwompcacc{} acc / \musttwompcauc{} AUC \\
+\bottomrule
+\end{tabular}
+\end{center}
+The continuous-feature refit \emph{\musresumphrase{}} the
+discrete-$K=20$ fit on both datasets. This is the empirical
+signature of the under-identification \cref{thm:rank-continuous}
+predicts when $d > N$: each LOO refit lands at a different point on
+the $74$-dimensional (MUSK1) or $64$-dimensional (MUSK2) null space
+of $\Phi$, and held-out bag predictions inherit the variation
+because the feature scaling, the held-out instances, and the chosen
+null-space point all shift fold-to-fold. The discrete-$K = 20$ fit
+throws away chemical-descriptor variation but has an identified
+parameter on every fold, so its LOO predictions are consistent.
+
+\paragraph{Interpretation.} The framework's value on real data is
+twofold. First, the rank diagnostic remains a precise structural
+tool under either feature map; it correctly warned that the
+$d = 166$ continuous-feature fit on $N \leq 102$ bags would be
+under-identified, and the LOO degradation confirmed the warning.
+Second, the framework's own prescription for repair is
+rank-reduction of the feature map so that $\mathrm{rank}(\Phi)$
+equals the feature dimension. \Cref{sec:musk-pca} carries out that
+prescription on MUSK with PCA to $k = 50$ principal components.
+
+\subsection{PCA-to-$k$ rank-reduction (framework prescription)}
+\label{sec:musk-pca}
+
+To test the framework's prescription empirically, we project the
+min-max-scaled features onto the top $k = 50$ principal components
+(refit per fold) and shift each component to be nonnegative so the
+$\bm\beta \geq 0$ constraint stays well-posed. The bag-summed
+feature matrix $\Phi_{\mathrm{PCA}} \in \R^{N \times 50}_{\geq 0}$
+then has rank $50$ for both MUSK1 and MUSK2 ($k < N$ in both
+cases), so \cref{thm:rank-continuous} guarantees identifiability of
+$\bm\beta$.
+
+\paragraph{Bag-level prediction (PCA).} The PCA-reduced
+continuous-feature MLE achieves LOO accuracy $\musonempcacc{}$ and
+LOO AUC $\musonempcauc{}$ on MUSK1, and accuracy
+$\musttwompcacc{}$ and AUC $\musttwompcauc{}$ on MUSK2. Relative to
+the under-identified $d = 166$ fit of the previous subsection, the
+identified PCA-to-$k = 50$ fit improves on both datasets (MUSK1 AUC
+$0.66 \to 0.68$, MUSK2 AUC $0.54 \to 0.56$), in the direction
+\cref{thm:rank-continuous} predicts: restoring identifiability
+stabilizes the LOO refits. The PCA fit does not, however, reach the
+discrete-$K = 20$ baseline of \cref{sec:musk} (MUSK1 AUC $0.79$,
+MUSK2 AUC $0.60$), and remains well below the published
+continuous-feature methods of \cref{tab:musk-comparison}.
+
+\paragraph{What the PCA experiment confirms, and what it does not.}
+The identifiability chain holds end to end: (i) the diagnostic
+flagged the $d > N$ regime as under-identified; (ii) the LOO of the
+$d = 166$ fit degraded as predicted; (iii) rank-reduction restored
+an identifiable parameter, $\mathrm{rank}(\Phi_{\mathrm{PCA}}) = 50
+= d$, as \cref{thm:rank-continuous} requires; and (iv) the LOO of
+the identified PCA fit improved over the under-identified fit. The
+framework's diagnostic and prescriptive content, that
+under-identification hurts predictive stability and that
+rank-reduction repairs it, is confirmed on real data.
+
+What the experiment does \emph{not} show is that identifiability
+buys competitiveness. The PCA fit stays below the discrete-$K = 20$
+baseline and far below mi-SVM and Diverse Density. Identifiability is
+necessary for stable estimation but not sufficient for predictive
+performance: the bag-OR likelihood with a linear-in-principal-
+components hazard is a weaker model class than the max-margin and
+concept-point methods, independent of whether its parameter is
+identified. The framework's contribution is to separate these two
+axes cleanly. It tells the practitioner when a parameter can be
+estimated at all (the rank condition) and when an estimate is
+stable (identifiability plus $\mathrm{rank}(\Phi) = d$), and it
+leaves the choice of hazard model class as a distinct decision that
+the identifiability analysis deliberately does not prejudge.
+
+\subsection{Future-work benchmarks}
+
+Elephant/Fox/Tiger image-region MIL \citep{andrews2003support} and
+weakly supervised computational pathology
+\citep{campanella2019clinical,lu2021data,bejnordi2017diagnostic} are
+natural next applications of the framework, the latter with expert
+pixel annotations serving as singleton candidate sets for the
+firing-rate confound of \cref{rem:firing-rate}. Both are left to
+future work; the MUSK demonstration in \cref{sec:musk} is
+sufficient to establish the structural diagnostics on real data.

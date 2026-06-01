@@ -1,0 +1,118 @@
+\section{Introduction}
+\label{sec:intro}
+
+Multiple instance learning (MIL) is a weakly supervised setting in
+which training data are grouped into \emph{bags} of instances and
+labels are observed only at the bag level
+\citep{dietterich1997solving,maron1998framework,andrews2003support}.
+In the standard binary formulation, a bag is positive when it
+contains at least one positive instance and negative otherwise; the
+instance-level labels are latent. MIL is the natural model for
+problems where annotation is cheap in aggregate but expensive per
+instance: drug-activity prediction (a molecule is active if at least
+one of its conformations binds), image classification (an image is
+positive if some region contains the object of interest), and,
+increasingly, computational pathology, where a gigapixel
+whole-slide image carries a diagnosis but the diagnostic regions are
+not delineated \citep{campanella2019clinical,lu2021data}.
+
+A large methods literature attacks MIL: axis-parallel rectangles
+\citep{dietterich1997solving}, Diverse Density
+\citep{maron1998framework}, mi-SVM and MI-SVM
+\citep{andrews2003support}, and attention-based deep MIL
+\citep{ilse2018attention}, with problem variants surveyed by
+\citet{carbonneau2018multiple} and \citet{foulds2010review}. These
+methods differ in how they parametrize the instance-to-bag relation
+and how they pool instance evidence. None, however, characterizes
+\emph{when} the instance-level classifier is identifiable from bag
+labels alone, what auxiliary information restores identifiability
+when it fails, or what bias is incurred when the bag-formation
+assumption is wrong. Practical questions go unanswered: when are
+attention weights interpretable as instance scores? When does a MIL
+model that predicts bag labels well still mis-rank instances? How
+many instance-level labels are needed to calibrate a bag-trained
+model? The nearest existing identifiability-flavored line is
+partial-label learning \citep{cour2011learning}, in which each
+\emph{instance} carries a candidate \emph{label} set with one
+correct label; MIL is the dual coarsening, in which a candidate
+\emph{instance} set (the bag) carries one observed label.
+
+\subsection{The bridge to masked-data inference}
+
+We observe that MIL is mathematically isomorphic to the masked-data
+series-system identifiability problem of \citet{towell2026masked}.
+In that framework, $m$ components in series produce a system that
+fails when any one component fails; the failed component is masked,
+but a \emph{candidate set} known to contain it is observed.
+Identifiability conditions on the candidate-set matrix determine
+when component-level parameters can be recovered.
+
+The translation to MIL is direct. Instances play the role of
+components. The bag plays the role of the candidate set. The ``at
+least one positive instance'' rule is the series (logical-OR)
+aggregation: a bag is positive exactly when the disjunction of its
+instance labels is true, just as a series system fails exactly when
+the disjunction of its component-failure events is true. A
+\emph{singleton bag} (a bag with one instance, equivalently an
+instance-level label) is a singleton candidate set. The
+C1--C2--C3 coarsening conditions for ignorable masking port
+directly. The framework was previously applied to scRNA-seq zero
+inflation \citep{towell2026scrnacoarsening} and to
+spatial-transcriptomics deconvolution
+\citep{towell2026spatialcoarsening}; MIL is the discrete-label
+member of the same family, with one structural inversion worth
+flagging at the outset (\cref{sec:translation}): the \emph{negative}
+bag is the fully informative observation (every instance label is
+known to be $0$), while the \emph{positive} bag is the coarsened
+one.
+
+\subsection{Contributions}
+
+We contribute:
+
+\begin{itemize}
+\item \textbf{A bridge from MIL to masked-data inference}
+  (\cref{sec:translation}), formalizing mi-SVM, Diverse Density,
+  attention-based MIL, and CLAM as special cases of one
+  coarsening framework.
+
+\item \textbf{A rank condition} (\cref{sec:identifiability}):
+  instance-type positivity is identifiable from bag labels if and
+  only if the bag-by-instance-type composition matrix has full
+  column rank. Singleton bags contribute unit-vector rows and
+  restore rank, the discrete-label analogue of how
+  single-cell-resolution platforms restore identifiability in
+  spatial transcriptomics.
+
+\item \textbf{A bag-prevalence consistency theorem}
+  (\cref{sec:identifiability}): any maximizer of the bag-label
+  likelihood reproduces the observed bag-positive frequencies
+  exactly along every direction in the column space of the
+  composition matrix. Bag-level accuracy therefore cannot validate
+  instance-level scores, the MIL counterpart of cell-total
+  consistency in \citet{towell2026scrnacoarsening}.
+
+\item \textbf{A bias bound under aggregation-rule misspecification}
+  (\cref{sec:methodology}): a closed-form first-order bound on the
+  instance-score bias incurred when the true bag rule is noisy-OR,
+  label-noisy, or threshold rather than deterministic OR. The
+  standard-versus-collective assumption taxonomy of
+  \citet{foulds2010review} is recovered as a partition of
+  aggregation rules by whether they preserve the C1 condition.
+
+\item \textbf{A simulation that confirms the three theorems}
+  (\cref{sec:validation}) with known instance-level ground truth,
+  including a numerical demonstration of the firing-rate confound
+  and of the contrast between weighted and unweighted bag-residual
+  moment matching. A real-data application to MUSK1 and MUSK2
+  (\cref{sec:musk}) demonstrates the rank diagnostic and the
+  boundary-MLE regime on real chemical-descriptor data and quantifies
+  the gap to published continuous-feature MIL baselines.
+\end{itemize}
+
+The central message: MIL methods are not arbitrary heuristics; they
+are special cases of a single identifiability framework. The rank
+condition is a diagnostic a practitioner can run before trusting an
+instance-level output, attention weights in particular, since the
+framework makes precise when those weights estimate a parameter and
+when they merely interpolate a rank-deficient direction.

@@ -1,0 +1,104 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Relation to existing methods}
+
+The framework places the major MIL methods in a common
+assumption-naming language: each method corresponds to a particular
+parametrization of, or surrogate for, the same coarsening problem.
+\begin{itemize}
+\item \textbf{Diverse Density} \citep{maron1998framework} is a
+  noisy-OR maximum-likelihood specialization, and inherits the
+  firing-rate confound of \cref{rem:firing-rate}.
+\item \textbf{mi-SVM and MI-SVM} \citep{andrews2003support} are
+  hard-assignment surrogates for the candidate-set sum under the C1
+  (deterministic-OR) constraint.
+\item \textbf{Attention-based deep MIL} \citep{ilse2018attention}
+  learns a pooling map whose weights estimate instance scores only
+  in the column space of the composition matrix
+  (\cref{thm:rank,thm:bag-total}).
+\item \textbf{CLAM} \citep{lu2021data} adds instance-level
+  clustering supervision, which the framework reads as singleton
+  candidate sets that improve the rank of the design.
+\end{itemize}
+These methods perform differently across applications
+\citep{carbonneau2018multiple} for reasons the framework now
+names: each method's pooling rule or surrogate implicitly assumes a
+particular aggregation rule and a particular candidate-set
+structure, and performs well when the assumption matches the data.
+
+\subsection{Relation to partial-label learning}
+
+Partial-label learning (PLL) \citep{cour2011learning} is the closest
+identifiability-flavored neighbour of MIL and is worth a separate
+comparison because its mathematical machinery is, in our framework,
+a transposed instance of the same coarsening problem. In PLL, each
+training instance carries a \emph{candidate label set} of size at
+most $L$ that is known to contain the true label; the goal is to
+learn an instance-level $L$-way classifier despite the per-instance
+label ambiguity. In MIL, by contrast, each training bag carries a
+\emph{candidate instance set} (the bag itself) together with one
+observed binary label that is determined by the OR of latent
+instance labels. The two settings exchange the roles of ``instance''
+and ``label'' as the coarsened axis; both fit the masked-data
+template of \cref{sec:background}.
+
+The C1--C2--C3 conditions translate cleanly. C1 in PLL is the
+guarantee that the true label is in the candidate set, the
+defining assumption of the setting. C2 in PLL is the
+condition that candidate-set composition does not depend on which
+label is true given the instance features; \citet{cour2011learning}
+formalize a sufficient quantitative version of this as the
+\emph{small-ambiguity-degree} condition, under which the PLL
+empirical risk minimizer is consistent. C3 is the assumption that
+the candidate-set mechanism does not depend on the classifier
+parameter. The rank-style identifiability machinery of
+\cref{thm:rank} has a PLL analogue (a per-instance candidate-set
+matrix replaces the bag composition matrix), and the bias bound of
+\cref{thm:bias-rule} has a PLL analogue for misspecification of the
+ambiguity mechanism. The two literatures have evolved
+independently; the framework presented here makes their shared
+identifiability content explicit, and suggests that imports from
+the PLL side, particularly the small-ambiguity-degree analysis,
+may sharpen finite-sample rates for MIL.
+
+\subsection{What the framework does \emph{not} address}
+
+\begin{itemize}
+\item \textbf{Instance dependence within bags.} The DGP assumes
+  instance labels are conditionally independent given type. Bags
+  with correlated instances (non-i.i.d. MIL,
+  \citealp{foulds2010review}) need a C2 relaxation.
+\item \textbf{Fully nonparametric instance hazards.}
+  \Cref{thm:rank-continuous} extends the identifiability machinery
+  to continuous instance features under a linear-in-features
+  parametrization $s(x) = \bm\beta^\top \bm\phi(x)$. A fully
+  nonparametric treatment in which the per-instance hazard belongs
+  to a more general function class would require RKHS or sieve
+  techniques outside our scope.
+\item \textbf{Deep-pooling identifiability.} Attention pooling may
+  achieve practical identifiability through implicit regularization
+  not captured by the linear rank condition. Whether such methods
+  admit bias bounds comparable to \cref{thm:bias-rule} is open.
+\item \textbf{Adaptive bag construction.} If bags are formed with
+  knowledge of instance labels or of $\bm{\eta}$, C2 or C3 fails;
+  the C2-relaxation results of \cite{towell2026mdrelax} would be
+  the route to a quantitative treatment.
+\end{itemize}
+
+\subsection{Broader implications}
+
+The framework shifts MIL analysis from method-specific to
+assumption-specific reasoning. A practitioner asking ``can I trust
+this model's instance-level outputs?'' can now answer by checking
+whether the rank condition holds for the bag-composition structure,
+whether the aggregation rule is plausibly deterministic OR, and
+whether any instance-level labels are available to break the
+firing-rate confound. The most actionable consequence is a caution:
+by \cref{thm:bag-total}, a MIL model that predicts bag labels well
+tells us nothing on its own about instance-level correctness, so
+attention weights and instance scores require independent
+instance-resolved validation. This is the same shift previously
+achieved for scRNA-seq zero inflation
+\citep{towell2026scrnacoarsening} and spatial-transcriptomics
+deconvolution \citep{towell2026spatialcoarsening}.

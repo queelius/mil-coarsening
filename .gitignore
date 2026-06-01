@@ -1,0 +1,37 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.latexml.log
+sections/*.aux
+
+# Built paper PDF (re-buildable via `make paper`)
+main.pdf
+
+# MUSK raw data (re-downloadable via the UCI URLs in scripts/musk.R)
+data/musk1/
+data/musk2/
+data/musk1.zip
+data/musk2.zip
+
+# Computed outputs (re-buildable via `make sim` / `make musk` / `make figures`)
+results.rds
+data/musk_results.rds
+
+# R session state
+.Rhistory
+.RData
+.Rproj.user/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

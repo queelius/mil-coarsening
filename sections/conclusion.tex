@@ -1,0 +1,34 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+Multiple instance learning is the masked-data identifiability
+problem from reliability statistics, with instances playing the
+role of components, bags playing the role of candidate sets, the
+``at least one positive instance'' rule playing the role of series
+(logical-OR) aggregation, and singleton bags playing the role of
+singleton candidate sets. We proved (i) a rank condition on the
+bag-by-instance-type composition matrix that determines when
+instance-type positivity is identifiable from bag labels, (ii) a
+bag-prevalence consistency theorem explaining why a model that
+predicts bag labels well can still mis-rank instances, and (iii) a
+first-order bias bound under aggregation-rule misspecification that
+recovers the standard-versus-collective assumption taxonomy as a
+statement about which rules preserve the C1 coarsening condition.
+
+The framework places Diverse Density, mi-SVM, attention-based MIL,
+and CLAM in a common assumption-naming language and supplies a
+precise vocabulary for when each method's coarsening assumptions
+hold. It does not by itself derive new estimators; the contribution
+is diagnostic and structural rather than algorithmic. A confound between
+intrinsic instance positivity and the noisy-OR firing rate is the
+discrete-label analogue of the spike-in capture-efficiency gap in
+scRNA-seq, and it shows that absolute instance calibration requires
+instance-resolved auxiliary labels.
+
+The principal open extensions are continuous instance features,
+within-bag instance dependence, and identifiability of deep-pooling
+architectures whose practical behaviour may exceed the linear rank
+condition. Each is a natural follow-up, and each fits the same
+coarsening scaffold shared with the scRNA-seq and
+spatial-transcriptomics applications \citep{towell2026scrnacoarsening,
+towell2026spatialcoarsening}.

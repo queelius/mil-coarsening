@@ -1,0 +1,111 @@
+\section{Bias bound under aggregation-rule misspecification}
+\label{sec:methodology}
+
+The rank condition (\cref{thm:rank}) and bag-prevalence consistency
+(\cref{thm:bag-total}) assume the deterministic-OR rule
+\eqref{eq:trans-or}. Real bag labels need not obey it: instance
+labels may be noisy, bag labels may flip, or a bag may be called
+positive only when several instances are positive. We characterize
+the bias incurred when a deterministic-OR estimator is applied to
+data generated under a different rule.
+
+\subsection{Setup}
+
+Under deterministic OR, the negative-bag probability is
+$q_0(\bm{m};\bm{s}) = \exp(-\bm{m}^\top\bm{s})$. A misspecified
+aggregation rule replaces this with
+\begin{equation}
+  \Prob\{Y = 0 \mid \bm{m}\}
+  = q_0(\bm{m};\bm{s}) + \delta(\bm{m};\bm{s},\bm{\epsilon}),
+  \qquad \delta(\cdot;\cdot,\bm{0}) \equiv 0,
+  \label{eq:meth-delta}
+\end{equation}
+where the perturbation parameter $\bm{\epsilon}$ indexes the
+departure from OR and $\bm{\epsilon} = \bm{0}$ recovers it. Three
+cases are of practical interest.
+\begin{itemize}
+\item \textbf{Label noise.} With false-negative rate $\epsilon_-$
+  and false-positive rate $\epsilon_+$,
+  $\delta = \epsilon_-(1 - q_0) - \epsilon_+ q_0$.
+\item \textbf{Noisy-OR} \citep{pearl1988probabilistic}. With firing
+  rate $\rho = 1 - \epsilon$,
+  $\delta = \prod_k (1 - (1-\epsilon)\eta_k)^{m_k} - q_0$
+  (see \cref{rem:firing-rate}).
+\item \textbf{Threshold ($r$-of-$n$).} A bag is positive only when
+  at least $r$ instances are positive; $\delta$ is the difference
+  between the OR tail and the order-$r$ tail of the instance-label
+  count.
+\end{itemize}
+
+\subsection{Bias bound}
+
+Let $\ell(\bm{s}; Y, \bm{m})$ be the deterministic-OR bag
+log-likelihood, $\mathcal{I}(\bm{s})$ its Fisher information, and
+$\bm{s}^*$ the true log-survival vector.
+
+\begin{theorem}[First-order bias under aggregation-rule perturbation]
+\label{thm:bias-rule}
+Let $\hat{\bm{s}}(\bm{\epsilon})$ be the deterministic-OR maximum
+likelihood estimate computed on data generated under the perturbed
+rule \eqref{eq:meth-delta}, and let
+$\mathcal{I}(\bm{s}^*) = -\E_{\bm{0}}[\nabla^2_{\bm{s}}\,
+\ell(\bm{s}^*; Y, \bm{m})]$ be the Fisher information of the
+deterministic-OR model at the truth. Then
+\begin{equation}
+  \hat{\bm{s}}(\bm{\epsilon}) - \bm{s}^*
+  = \mathcal{I}(\bm{s}^*)^{-1}\,
+     \partial_{\bm{\epsilon}} \E_{\bm{\epsilon}}\!\big[
+       \nabla_{\bm{s}}\ell(\bm{s}^*; Y, \bm{m}) \big]
+     \big|_{\bm{\epsilon}=\bm{0}}
+     \,\bm{\epsilon}
+  \;+\; O(\|\bm{\epsilon}\|^2),
+  \label{eq:bias-rule}
+\end{equation}
+where the perturbation enters through the law of $Y$ under
+\eqref{eq:meth-delta} and the expectation is taken over both bag
+compositions and bag labels. The leading bias is linear in the rule
+deviation $\bm{\epsilon}$, with sensitivity matrix given by the
+derivative of the expected bag score with respect to $\bm{\epsilon}$,
+and it vanishes exactly when $\bm{\epsilon} = \bm{0}$.
+\end{theorem}
+
+\begin{proof}[Sketch]
+Equation \eqref{eq:bias-rule} is the standard implicit-function
+expansion of an M-estimator under a smooth perturbation of the
+data-generating distribution. Let
+$g(\bm{s}, \bm{\epsilon}) = \E_{\bm{\epsilon}}[\nabla_{\bm{s}}
+\ell(\bm{s}; Y, \bm{m})]$, where the expectation is over the
+perturbed law of $Y$. The estimating equation is
+$g(\hat{\bm{s}}(\bm{\epsilon}), \bm{\epsilon}) = \bm{0}$, with
+$g(\bm{s}^*, \bm{0}) = \bm{0}$ at the true parameter under
+deterministic OR. Differentiating implicitly at $\bm{\epsilon}=\bm{0}$
+gives $\partial_{\bm{\epsilon}}\hat{\bm{s}} = -(\partial_{\bm{s}}
+g)^{-1}\,\partial_{\bm{\epsilon}} g$, and
+$\partial_{\bm{s}} g = \E_{\bm{0}}[\nabla^2_{\bm{s}}\ell] =
+-\mathcal{I}(\bm{s}^*)$, yielding the $+\mathcal{I}^{-1}$ form
+above. The construction parallels the marker-gene bias bound for
+spatial deconvolution \cite[\S 5]{towell2026spatialcoarsening} and
+the spike-in oracle bias for scRNA-seq
+\cite[\S 7]{towell2026scrnacoarsening}. Full proof with regularity
+conditions in \cref{app:proof-bias-rule}, where the noisy-OR
+sensitivity is also worked out in closed form.
+\end{proof}
+
+\subsection{Recovery of the standard-versus-collective taxonomy}
+
+\citet{foulds2010review} organize MIL methods by their bag
+assumption: the \emph{standard} assumption is exactly deterministic
+OR, while \emph{collective} assumptions let the bag label depend on
+the proportion or count of positive instances. In our framework this
+taxonomy has a one-line characterization. The standard assumption is
+the regime in which C1 holds with probability one: a positive bag
+contains an individually positive instance. Collective assumptions
+violate C1, because a bag can be ``positive'' with no individually
+positive instance (a threshold rule with $r > 1$, or a
+proportion rule). \Cref{thm:bias-rule} then states that the bias of
+a standard-assumption estimator applied to collective-assumption
+data is first-order in the size of the C1 violation
+$\bm{\epsilon}$, and zero precisely when C1 holds. The
+\citet{foulds2010review} taxonomy is, in this framework, a
+partition of aggregation rules by whether they preserve C1, and the
+bias bound quantifies the cost of crossing the partition.

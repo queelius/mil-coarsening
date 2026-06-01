@@ -1,0 +1,71 @@
+\section{Masked-data inference: brief primer}
+\label{sec:background}
+
+We summarize the masked-data identifiability framework
+\citep{towell2026masked,heitjan1991ignorability}. Readers familiar
+with this work or with the companion applications
+\citep{towell2026scrnacoarsening,towell2026spatialcoarsening} can
+skim to \cref{sec:translation}.
+
+Consider $m$ independent components in series. Each component $j$
+has a parametric distribution $f_j(\cdot;\theta_j)$ for its lifetime
+$T_{ij}$ in system $i$. The system fails at $T_i = \min_j T_{ij}$
+with cause $K_i = \arg\min_j T_{ij}$. We observe $T_i$ but not $K_i$
+directly; instead we observe a \emph{candidate set} $C_i \subseteq
+\{1,\ldots,m\}$ thought to contain the failed component.
+
+The joint likelihood factorizes as
+\begin{equation}
+  f(t, k, c; \theta)
+  = h_k(t; \theta_k) \prod_{\ell} R_\ell(t; \theta_\ell)
+    \cdot \Prob_\theta\{C_i = c \mid T_i = t, K_i = k\},
+  \label{eq:bg-joint}
+\end{equation}
+where $h_\ell$ is the component-$\ell$ hazard and $R_\ell$ its
+survival function. The third factor is the unknown masking
+mechanism.
+
+Three coarsening conditions allow the masking factor to drop from
+the score:
+
+\begin{condition}[Support, C1]
+\label{cond:c1}
+$\Prob\{K_i \in C_i\} = 1$.
+\end{condition}
+
+\begin{condition}[Symmetry, C2]
+\label{cond:c2}
+$\Prob_\theta\{C_i=c \mid T_i=t, K_i=j\} = \Prob_\theta\{C_i=c \mid
+T_i=t, K_i=k\}$ for all $j,k \in c$.
+\end{condition}
+
+\begin{condition}[Parameter independence, C3]
+\label{cond:c3}
+$\Prob_\theta\{C_i=c \mid T_i, K_i\}$ does not depend on $\theta$.
+\end{condition}
+
+Under all three, the likelihood collapses to a product of a
+system-level factor and a candidate-set sum that no longer involves
+the masking mechanism, and \citet[Theorem 8]{towell2026masked}
+establish identifiability:
+
+\begin{theorem}[Identifiability under C1--C2--C3]
+\label{thm:bg-id}
+Under \cref{cond:c1,cond:c2,cond:c3} and standard regularity,
+$\theta$ is identifiable iff the augmented candidate-set matrix
+$\tilde{C} \in \{0,1\}^{n \times m}$ has full column rank $m$.
+\end{theorem}
+
+\emph{Singleton} candidate sets ($|c_i|=1$) are critical: each
+isolates a single component contribution and adds an identifying
+unit-vector row to $\tilde{C}$.
+
+The framework has been ported to scRNA-seq zero inflation, where the
+candidate set per gene is a single bit (zero vs. nonzero count)
+\citep{towell2026scrnacoarsening}, and to spatial-transcriptomics
+deconvolution, where each spot carries a probability distribution
+over cell types \citep{towell2026spatialcoarsening}. We now port it
+to multiple instance learning, where the latent quantity and the
+observed label are both \emph{discrete}: the candidate set is a bag
+of instances, and the coarsening is logical-OR aggregation of binary
+instance labels.

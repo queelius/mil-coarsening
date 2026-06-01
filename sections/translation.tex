@@ -1,0 +1,120 @@
+\section{Translation: MIL as a coarsening problem}
+\label{sec:translation}
+
+\subsection{The DGP}
+
+Consider a domain of instances partitioned into $K$ \emph{instance
+types}; the continuous-feature extension, in which $K$ is replaced
+by a feature map, is developed in \cref{sec:continuous}. Each type
+$k$ has an unknown instance-positive probability
+\begin{equation}
+  \eta_k = \Prob\{y = 1 \mid \text{instance of type } k\}
+  \in [0,1).
+  \label{eq:trans-eta}
+\end{equation}
+A dataset consists of $N$ bags. Bag $i$ contains a multiset of
+instances summarized by its \emph{composition vector}
+$\bm{m}_i \in \mathbb{Z}_{\geq 0}^K$, where $m_{ik}$ is the count of
+type-$k$ instances in bag $i$. Conditional on the composition, the
+instance labels $y_{ij}$ are independent Bernoulli$(\eta_{k(j)})$,
+and the observed bag label is the logical-OR
+\begin{equation}
+  Y_i = \max_j y_{ij}
+  = \1\Big\{ \textstyle\sum_j y_{ij} \geq 1 \Big\}.
+  \label{eq:trans-or}
+\end{equation}
+We observe $(\bm{m}_i, Y_i)$ together with instance features; the
+instance labels $y_{ij}$ are latent. Writing the per-type
+log-survival $s_k = -\log(1 - \eta_k) \geq 0$ and stacking
+$\bm{s} = (s_1,\ldots,s_K)$, independence gives the closed-form bag
+likelihood
+\begin{equation}
+  \Prob\{Y_i = 0 \mid \bm{m}_i\}
+  = \prod_{k=1}^K (1 - \eta_k)^{m_{ik}}
+  = \exp\!\big(-\bm{m}_i^\top \bm{s}\big).
+  \label{eq:trans-lik}
+\end{equation}
+Equation \eqref{eq:trans-lik} says the negative-log-probability of a
+negative bag is \emph{additive} in instance contributions: bag
+labels follow a Bernoulli model with complementary-log-log link and
+linear predictor $\bm{m}_i^\top \bm{s}$.
+
+\subsection{The translation}
+
+\Cref{tab:translation} states the explicit correspondence to
+masked-data inference.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Masked-data framework} & \textbf{Multiple instance learning} \\
+\midrule
+Component $j \in \{1,\ldots,m\}$ & Instance type $k \in \{1,\ldots,K\}$ \\
+Component event (failure) & Instance label $y_{ij} = 1$ \\
+System failure $T_i = \min$ / OR of events & Bag label $Y_i = \max_j y_{ij}$ \\
+Failed cause $K_i$ & Which instance is positive (latent) \\
+\textbf{Candidate set} $c_i$ & \textbf{Bag} (its instance composition $\bm{m}_i$) \\
+Singleton candidate $|c_i| = 1$ & Singleton bag (an instance-level label) \\
+Identifying functions & Instance feature representation \\
+Masking mechanism & Bag-formation mechanism \\
+C1 (cause in candidate set) & $Y_i = 1 \Rightarrow$ a positive instance is in bag $i$ \\
+C2 (symmetric masking) & Bag assignment is exchangeable in instance labels \\
+C3 (parameter independence) & Bag formation does not depend on $\bm{\eta}$ \\
+\bottomrule
+\end{tabular}
+\caption{Translation between the masked-data framework
+\citep{towell2026masked} and multiple instance learning.}
+\label{tab:translation}
+\end{table}
+
+One structural feature has no counterpart in the earlier
+applications. In scRNA-seq, the ambiguous observation was a
+\emph{zero} count; in MIL, the ambiguous observation is a
+\emph{positive} bag. A negative bag resolves every instance label
+($y_{ij} = 0$ for all $j$, by C1) and so is fully informative,
+whereas a positive bag is the coarsened observation. The
+masked-data framework is polarity-agnostic, so the apparatus
+transfers unchanged; the practical consequence is that the
+identifying ``singletons'' here are positive instance-level labels,
+not the known-rate controls used in scRNA-seq.
+
+Under deterministic OR, C1 holds by construction: a positive bag
+contains a positive instance with probability one. C2 holds when
+the rule for grouping instances into bags does not look at the
+latent labels, and C3 holds when that grouping does not depend on
+$\bm{\eta}$. Both are reasonable for benchmark MIL, where bags are
+fixed by the data-collection protocol (a molecule, an image, a
+slide) rather than constructed adaptively.
+
+\subsection{Existing methods in this language}
+
+\paragraph{Diverse Density \citep{maron1998framework}} maximizes a
+noisy-OR bag likelihood over a target concept point. In our
+language, this is maximum likelihood under \eqref{eq:trans-lik}
+with $\eta$ parametrized by distance to the concept point and a
+firing rate below one (see \cref{sec:identifiability} for the
+resulting confound).
+
+\paragraph{mi-SVM and MI-SVM \citep{andrews2003support}} impute
+instance labels subject to the bag-OR constraint and fit a
+max-margin instance classifier. The OR constraint is exactly C1;
+the imputation step is a hard-assignment surrogate for the
+candidate-set sum.
+
+\paragraph{Attention-based deep MIL \citep{ilse2018attention}} pools
+instance embeddings with learned attention weights. The attention
+weights are commonly read as instance importances; the rank
+condition of \cref{sec:identifiability} states precisely when that
+reading estimates a parameter.
+
+\paragraph{CLAM \citep{lu2021data}} applies attention MIL to
+whole-slide pathology images and adds instance-level clustering
+supervision. The clustering supervision injects partial
+instance-level labels: singleton candidate sets in our framework.
+
+These methods are not in conflict; they are different
+parametrizations and different surrogates for the same coarsening
+problem. The framework lets us state when each is identifiable and
+what bias it inherits when its aggregation assumption fails.

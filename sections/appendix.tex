@@ -1,0 +1,237 @@
+\appendix
+
+\section{Proofs}
+\label{app:proofs}
+
+This appendix provides self-contained proofs of the three theorems
+stated in \cref{sec:identifiability,sec:methodology}. The setup
+and notation follow \cref{sec:translation} throughout.
+
+\subsection{Proof of Theorem 1 (rank condition)}
+\label{app:proof-rank}
+
+\begin{proof}[Proof of \cref{thm:rank}]
+Recall the bag-OR data-generating process: instances of type $k$
+have positivity $\eta_k \in [0,1)$, write $s_k = -\log(1 - \eta_k)
+\geq 0$, and let $M \in \mathbb{Z}_{\geq 0}^{N \times K}$ be the
+composition matrix with rows $\bm{m}_i$. Under conditional
+independence of instance labels and the OR aggregation rule,
+\begin{equation}
+  \Prob_{\bm s}\{Y_i = y \mid \bm m_i\}
+   = (1 - e^{-S_i})^{y}\,(e^{-S_i})^{1-y},
+   \qquad S_i := \bm m_i^\top \bm s, \quad y \in \{0,1\}.
+   \label{eq:app-bag-lik}
+\end{equation}
+The map $\Prob_{\bm s} : \bm s \mapsto \prod_i
+\Prob_{\bm s}\{Y_i = y_i \mid \bm m_i\}$ is parameter-identifiable
+on $[0,\infty)^K$ if and only if $\Prob_{\bm s} = \Prob_{\bm s'}$
+implies $\bm s = \bm s'$.
+
+\paragraph{($\Leftarrow$) Sufficiency of full column rank.}
+Suppose $\mathrm{rank}(M) = K$. The function
+$\sigma : \mathbb{R}_{\geq 0} \to [0,1]$ defined by $\sigma(S) = 1 -
+e^{-S}$ is strictly increasing and continuous, so $\Prob_{\bm s}$
+depends on $\bm s$ only through the vector $M\bm s$ and is a
+one-to-one function of that vector. If $\Prob_{\bm s} =
+\Prob_{\bm s'}$, then $\sigma(\bm m_i^\top \bm s) = \sigma(\bm m_i^\top
+\bm s')$ for all $i$, hence $\bm m_i^\top \bm s = \bm m_i^\top \bm s'$
+for all $i$, i.e., $M\bm s = M\bm s'$. Full column rank of $M$ makes
+$\bm s \mapsto M\bm s$ injective, so $\bm s = \bm s'$.
+
+\paragraph{($\Rightarrow$) Necessity of full column rank.}
+Suppose $\mathrm{rank}(M) < K$. There exists $\bm v \in \mathbb{R}^K
+\setminus \{\bm 0\}$ with $M\bm v = \bm 0$. Fix any
+$\bm s \in \mathbb{R}_{> 0}^K$ (interior of the parameter space)
+and choose $t \in \mathbb{R}$ small enough that
+$\bm s + t\bm v \in \mathbb{R}_{> 0}^K$ (possible because the
+interior is open). Then $M(\bm s + t\bm v) = M\bm s$, so by
+\eqref{eq:app-bag-lik}, $\Prob_{\bm s + t\bm v} = \Prob_{\bm s}$.
+Since $t\bm v \neq \bm 0$, the corresponding $\bm \eta$ and
+$\bm \eta'$ differ, so $\bm \eta$ is not identifiable.
+
+The two directions combine to give the iff statement. \qedhere
+\end{proof}
+
+The proof reveals that the identifying structure is the cloglog
+linear-predictor map $\bm s \mapsto M\bm s$. This linearity is
+what makes the continuous-feature extension of \cref{sec:continuous}
+clean: replacing $M$ with the bag-summed feature matrix $\Phi$
+preserves linearity in the parameter $\bm\beta$ and inherits the
+same identifiability characterization.
+
+\subsection{Proof of Theorem 4 (continuous-feature rank condition)}
+\label{app:proof-cont-rank}
+
+\begin{proof}[Proof of \cref{thm:rank-continuous}]
+The bag-label distribution under the continuous-feature
+parametrization \eqref{eq:trans-cont-lik} is
+\begin{equation*}
+  \Prob_{\bm\beta}\{Y_i = y_i \mid B_i\}
+   = (1 - e^{-\bm\beta^\top \bm\Phi_i})^{y_i}
+     (e^{-\bm\beta^\top \bm\Phi_i})^{1 - y_i},
+\end{equation*}
+which depends on $\bm\beta$ only through the linear predictor
+$\bm\beta^\top \bm\Phi_i$. The proof is then identical in structure
+to that of \cref{thm:rank} in \cref{app:proof-rank} with $(M, \bm s)$
+replaced by $(\Phi, \bm\beta)$.
+
+\paragraph{($\Leftarrow$) Sufficiency.}
+Suppose $\mathrm{rank}(\Phi) = d$. As before, $\sigma(S) = 1 -
+e^{-S}$ is strictly increasing, so $\Prob_{\bm\beta} =
+\Prob_{\bm\beta'}$ forces $\bm\beta^\top \bm\Phi_i = \bm\beta'^\top
+\bm\Phi_i$ for all $i$, i.e., $\Phi(\bm\beta - \bm\beta') = \bm 0$.
+Full column rank of $\Phi$ implies $\bm\beta = \bm\beta'$.
+
+\paragraph{($\Rightarrow$) Necessity.}
+Suppose $\mathrm{rank}(\Phi) < d$. Choose $\bm v \in \mathbb{R}^d
+\setminus \{\bm 0\}$ with $\Phi \bm v = \bm 0$. For any
+$\bm\beta$ in the interior of the constraint set (so $\bm\beta^\top
+\bm\phi(x) > 0$ on the data support) and sufficiently small $t$,
+$\bm\beta + t\bm v$ remains in the interior. Then $\Phi(\bm\beta +
+t\bm v) = \Phi\bm\beta$, so $\Prob_{\bm\beta + t\bm v} =
+\Prob_{\bm\beta}$ while $\bm\beta + t\bm v \neq \bm\beta$.
+\qedhere
+\end{proof}
+
+When $d > N$, the column rank of $\Phi$ is necessarily at most $N$,
+so $\bm\beta$ is under-identified by at least $d - N$ dimensions.
+Bag-level predictions remain identified because they depend on
+$\bm\beta$ only through $\Phi\bm\beta$, which is preserved by any
+addition of a $\Phi$-null direction.
+
+\subsection{Proof of Theorem 2 (bag-prevalence consistency)}
+\label{app:proof-bag-total}
+
+\begin{proof}[Proof of \cref{thm:bag-total}]
+The bag-OR log-likelihood, using \eqref{eq:app-bag-lik}, is
+\begin{equation}
+  \ell(\bm s)
+  \;=\; \sum_{i=1}^N \Big[ Y_i \log(1 - e^{-S_i})
+                          + (1 - Y_i)(-S_i) \Big],
+  \qquad S_i = \bm m_i^\top \bm s.
+  \label{eq:app-loglik}
+\end{equation}
+Differentiating with respect to $s_k$ and using
+$\partial S_i / \partial s_k = m_{ik}$,
+\begin{align}
+  \frac{\partial \ell}{\partial s_k}
+  &= \sum_i m_{ik} \Big[ Y_i \cdot \frac{e^{-S_i}}{1 - e^{-S_i}}
+                          - (1 - Y_i) \Big].
+  \label{eq:app-score-raw}
+\end{align}
+Substitute $p_i := 1 - e^{-S_i}$, so $e^{-S_i} = 1 - p_i$ and
+$e^{-S_i}/(1 - e^{-S_i}) = (1 - p_i)/p_i$:
+\begin{align}
+  \frac{\partial \ell}{\partial s_k}
+  &= \sum_i m_{ik} \Big[ \frac{Y_i(1 - p_i)}{p_i} - (1 - Y_i) \Big]
+  \;=\; \sum_i m_{ik} \cdot \frac{Y_i(1 - p_i) - p_i(1 - Y_i)}{p_i} \notag \\
+  &= \sum_i m_{ik} \cdot \frac{Y_i - p_i}{p_i}.
+  \label{eq:app-score-final}
+\end{align}
+
+At an interior maximizer $\hat{\bm s} > 0$, every coordinate of the
+gradient vanishes:
+$\sum_i m_{ik}(Y_i - \hat p_i)/\hat p_i = 0$ for each $k$, where
+$\hat p_i = 1 - \exp(-\bm m_i^\top \hat{\bm s})$. Stacking, this is
+$M^\top D^{-1}(\bm Y - \hat{\bm p}) = \bm 0$ with $D =
+\mathrm{diag}(\hat{\bm p})$.
+
+At a boundary maximizer with $\hat s_k = 0$ for some $k$, the KKT
+conditions for the bound-constrained problem
+$\max\{\ell(\bm s) : \bm s \geq \bm 0\}$ require
+$\partial \ell / \partial s_k \leq 0$ at the constrained coordinate
+(with equality allowed) and equality at interior coordinates.
+Substituting from \eqref{eq:app-score-final}, the constrained
+coordinate satisfies $\sum_i m_{ik}(Y_i - \hat p_i)/\hat p_i \leq 0$
+while the interior coordinates retain the equality. \qedhere
+\end{proof}
+
+\begin{remark}
+The unweighted residual $M^\top(\bm Y - \hat{\bm p})$ is in general
+nonzero at the MLE, as Wave 2 of the simulation confirms with
+median magnitude near $5$ versus weighted-residual magnitude near
+$10^{-7}$. The weighting $D^{-1}$ in \eqref{eq:bag-total} cannot be
+removed by reparametrization: the link
+$g(\mu) = -\log(1-\mu)$ is not canonical for the Bernoulli family,
+and the IRLS weights are exactly the link-variance factors that
+make the score linear in $\bm s$.
+\end{remark}
+
+\subsection{Proof of Theorem 3 (aggregation-rule bias)}
+\label{app:proof-bias-rule}
+
+\begin{proof}[Proof of \cref{thm:bias-rule}]
+Let $\ell_\epsilon(\bm s)$ denote the bag-OR log-likelihood
+evaluated on data generated under the $\bm\epsilon$-perturbed
+DGP \eqref{eq:meth-delta}; the dependence on $\bm\epsilon$ is
+through the distribution of $Y_i$, not through $\ell$'s formula.
+Define the expected-score function
+\begin{equation}
+  g(\bm s, \bm\epsilon) \;:=\;
+  \E_{\bm\epsilon}\!\big[\nabla_{\bm s} \ell(\bm s; Y, \bm m)\big],
+\end{equation}
+where the expectation is over the bag composition $\bm m$ and the
+$\bm\epsilon$-distributed bag label $Y$. Standard M-estimator
+asymptotics give $g(\hat{\bm s}(\bm\epsilon), \bm\epsilon) = \bm 0$
+in the limit of large $N$, and $\hat{\bm s}(\bm 0) = \bm s^*$ by
+consistency of the MLE under correct specification.
+
+By the implicit function theorem applied to
+$g(\hat{\bm s}(\bm\epsilon), \bm\epsilon) = \bm 0$ at
+$\bm\epsilon = \bm 0$:
+\begin{equation}
+  \partial_{\bm s}\, g(\bm s^*, \bm 0)
+   \cdot \partial_{\bm\epsilon} \hat{\bm s}(\bm 0)
+   + \partial_{\bm\epsilon}\, g(\bm s^*, \bm 0)
+   = \bm 0,
+   \label{eq:app-implicit-diff}
+\end{equation}
+and the second Bartlett identity at the true parameter under
+correct specification gives
+$\partial_{\bm s}\, g(\bm s^*, \bm 0) = \E_{\bm 0}[\nabla^2_{\bm s}
+\ell(\bm s^*; Y, \bm m)] = -\mathcal{I}(\bm s^*)$, with
+$\mathcal{I}$ the Fisher information at the truth. Substituting and
+solving,
+\begin{equation}
+  \partial_{\bm\epsilon} \hat{\bm s}(\bm 0)
+   \;=\; \mathcal{I}(\bm s^*)^{-1}\,
+         \partial_{\bm\epsilon}\, g(\bm s^*, \bm 0),
+\end{equation}
+which is the linear (first-order Taylor) term of
+\eqref{eq:bias-rule}. Smoothness of $g$ in $\bm\epsilon$ supplies
+the $O(\|\bm\epsilon\|^2)$ remainder. \qedhere
+\end{proof}
+
+For the three concrete rules of \cref{sec:methodology} the
+sensitivity $\partial_{\bm\epsilon} g(\bm s^*, \bm 0)$ admits closed
+forms; we give the noisy-OR case explicitly as it is the focal
+example of \cref{rem:firing-rate}.
+
+\paragraph{Noisy-OR sensitivity.}
+Under noisy-OR with firing rate $\rho = 1 - \epsilon$, the perturbed
+DGP has
+$\Prob_\epsilon\{Y = 1 \mid \bm m\} = 1 - \prod_k (1 - (1-\epsilon)
+\eta_k)^{m_k} = 1 - \exp(-\bm m^\top \bm s^*(\epsilon))$, where
+$s_k^*(\epsilon) = -\log(1 - (1-\epsilon)\eta_k)$. Differentiating
+at $\epsilon = 0$,
+$\partial_\epsilon s_k^*(0) = -\eta_k / (1 - \eta_k) = -(e^{s_k^*} -
+1)$, so
+$\E_\epsilon[Y_i] - p_i^*
+= -(1 - p_i^*)\,\bm m_i^\top \dot{\bm s}\,\epsilon
++ O(\epsilon^2)$
+with $\dot s_k = -(e^{s_k^*} - 1)$ and
+$p_i^* = 1 - e^{-\bm m_i^\top \bm s^*}$. The score sensitivity is
+\begin{equation}
+  \big[\partial_\epsilon g(\bm s^*, 0)\big]_k
+  \;=\; -\sum_i m_{ik}\,\frac{1 - p_i^*}{p_i^*}\,
+         \bm m_i^\top \dot{\bm s}.
+  \label{eq:app-noisy-or-sens}
+\end{equation}
+At small $\epsilon$ this matches the empirical observation
+$\hat\eta_k / \eta_k \approx \rho = 1 - \epsilon$ from
+\cref{fig:firing-rate}: the bias rotates $\hat{\bm s}$ along the
+direction $\dot{\bm s}$ that corresponds to a multiplicative
+rescaling of $\bm\eta$ by $\rho$.
+
+The label-noise and threshold cases produce analogous sensitivities;
+their derivations are parallel and are omitted.

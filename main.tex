@@ -1,0 +1,131 @@
+%% Coarsening at random for multiple instance learning:
+%% identifiability conditions for instance-level inference.
+%% Conference-format draft (target: 12 pages incl. references).
+
+\documentclass[11pt,letterpaper]{article}
+
+%% ============================================================================
+%% Packages
+%% ============================================================================
+
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{natbib}
+\usepackage{cleveref}
+
+%% Theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{condition}{Condition}
+\crefname{condition}{Condition}{Conditions}
+\Crefname{condition}{Condition}{Conditions}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+%% Macros
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\X}{X}
+\newcommand{\Y}{Y}
+
+%% Placeholders for MUSK numbers populated from scripts/musk.R.
+%% (Filled in by hand after each rerun; see HANDOFF.md for the protocol.)
+\newcommand{\musonemkacc}{0.75}
+\newcommand{\musonemkauc}{0.79}
+\newcommand{\musttwomkacc}{0.56}
+\newcommand{\musttwomkauc}{0.60}
+\newcommand{\musonemcacc}{0.55}
+\newcommand{\musonemcauc}{0.66}
+\newcommand{\musttwomcacc}{0.53}
+\newcommand{\musttwomcauc}{0.54}
+\newcommand{\musresumphrase}{underperforms}
+\newcommand{\musonempcacc}{0.57}
+\newcommand{\musonempcauc}{0.68}
+\newcommand{\musttwompcacc}{0.54}
+\newcommand{\musttwompcauc}{0.56}
+
+%% Title
+\title{Coarsening at random for multiple instance learning:\\
+       identifiability conditions for instance-level inference}
+
+\author{
+  Alexander Towell \\
+  Department of Computer Science \\
+  Southern Illinois University Edwardsville \\
+  \texttt{lex@metafunctor.com} \\
+  ORCID: \href{https://orcid.org/0000-0001-6443-9897}{0000-0001-6443-9897}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Multiple instance learning (MIL) trains on \emph{bags} of instances
+labelled only at the bag level: a bag is positive when at least one
+of its instances is positive, and the instance labels are latent.
+Methods such as mi-SVM, Diverse Density, and attention-based deep MIL
+recover instance-level structure, but the conditions under which
+instance-level inference is identifiable from bag labels have not
+been characterized. We show that MIL is an instance of the
+masked-data identifiability problem from reliability statistics:
+instances are components, bags are candidate sets, the ``at least
+one positive instance'' rule is series (logical-OR) aggregation, and
+singleton bags (instance-level labels) are singleton candidate sets
+that restore identifiability.
+
+We establish: (i) a rank condition for identifiability of
+instance-type positivity, stated in terms of the
+bag-by-instance-type composition matrix; (ii) a bag-prevalence
+consistency theorem showing that any interior bag-likelihood
+maximizer satisfies an IRLS-weighted moment-matching identity
+along the column space of the composition matrix, so bag-level
+accuracy cannot validate instance-level scores; and (iii) a
+closed-form first-order bias bound under aggregation-rule
+misspecification. The standard-versus-collective MIL assumption
+taxonomy is recovered as a statement about which aggregation rules
+preserve the C1 coarsening condition. A confound between intrinsic
+instance positivity and the noisy-OR firing rate is identified as
+the discrete-label analogue of the spike-in capture-efficiency gap
+in scRNA-seq. The framework places mi-SVM, Diverse Density,
+attention-based MIL, and CLAM in a common assumption-naming language,
+exposing which coarsening conditions each method implicitly assumes,
+and supplies a rank diagnostic to run before trusting instance-level
+outputs.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/translation}
+\input{sections/identifiability}
+\input{sections/methodology}
+\input{sections/validation}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\input{sections/appendix}
+
+\end{document}

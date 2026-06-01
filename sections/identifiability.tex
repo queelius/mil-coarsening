@@ -1,0 +1,191 @@
+\section{Identifiability and bag-prevalence consistency}
+\label{sec:identifiability}
+
+We port \cref{thm:bg-id} to MIL and derive a bag-prevalence
+consistency corollary.
+
+\subsection{The rank condition}
+
+Let the bag-by-instance-type composition matrix
+$M \in \mathbb{Z}_{\geq 0}^{N \times K}$ have rows $\bm{m}_i$. By
+\eqref{eq:trans-lik}, the bag-label distribution depends on the
+parameter only through the linear predictors
+$\{\bm{m}_i^\top \bm{s}\}_{i=1}^N = M\bm{s}$.
+
+\begin{theorem}[Identifiability of instance-type positivity]
+\label{thm:rank}
+The instance-type positivity parameters
+$\eta_k = 1 - e^{-s_k}$, $k = 1,\ldots,K$, are identifiable from the
+bag labels $\{Y_i\}$ if and only if the composition matrix $M$ has
+full column rank $K$.
+\end{theorem}
+
+\begin{proof}[Sketch]
+Necessity: if $\mathrm{rank}(M) < K$, choose $\bm{v} \neq \bm{0}$
+with $M\bm{v} = \bm{0}$. For $t$ small enough that
+$\bm{s} + t\bm{v}$ stays in the nonnegative orthant, $M(\bm{s} +
+t\bm{v}) = M\bm{s}$, so $\bm{s}$ and $\bm{s} + t\bm{v}$ induce
+identical bag-label distributions for distinct $\bm{\eta}$.
+Sufficiency: full column rank makes $\bm{s} \mapsto M\bm{s}$
+injective. The bag labels then form a complementary-log-log-link
+Bernoulli GLM with design $M$; the linear predictor, hence $\bm{s}$,
+hence $\bm{\eta}$, is identified by standard GLM regularity. Full
+proof in \cref{app:proof-rank}.
+\end{proof}
+
+\Cref{thm:rank} is the MIL analogue of \cref{thm:bg-id}. It
+clarifies the role of instance-level labels: a singleton bag holding
+one type-$k$ instance contributes the unit-vector row $\bm{e}_k$ to
+$M$, maximally informative for $s_k$. The reliability statement
+``singletons restore identifiability'' becomes ``a few instance-level
+labels per type restore identifiability'', which is the framework's
+explanation for why semi-supervised MIL works.
+
+\begin{remark}[The firing-rate confound]
+\label{rem:firing-rate}
+Under \emph{noisy}-OR aggregation, a positive instance triggers the
+bag label with firing rate $\rho \in (0,1]$. Then
+$\Prob\{Y_i = 0 \mid \bm{m}_i\} = \prod_k (1 - \rho\eta_k)^{m_{ik}}$,
+so bag labels identify only the products $\rho\eta_k$, not $\rho$
+and $\bm{\eta}$ separately. The absolute calibration of instance
+positivity is non-identified from bag labels alone; only the
+\emph{ranking} of types and their relative positivity are
+recovered. A singleton bag of type $k$ does not by itself break the
+confound, since
+$\Prob\{Y = 1 \mid \text{type-}k\text{ singleton}\} = \rho\eta_k$
+inherits the same product. Two auxiliary signals do break it:
+direct observation of latent instance labels $y_j$ (which delivers
+$\eta_k$ unmediated by $\rho$), or a calibrated positive-control
+type with known $\eta = 1$ (whose singleton-bag positive rate
+delivers $\rho$ directly). This is the discrete-label analogue of
+the ERCC capture-efficiency confound in scRNA-seq
+\citep{towell2026scrnacoarsening}: the coarsening channel carries a
+gain parameter that only instance-resolved or calibrated auxiliary
+observations can separate from the signal.
+\end{remark}
+
+\subsection{When does the rank condition fail?}
+
+The composition matrix $M$ has full column rank $K$ as long as the
+bags collectively span the instance-type space. The condition fails
+when:
+\begin{itemize}
+\item Two instance types always co-occur in fixed proportion across
+  bags. Their columns of $M$ are then collinear, and only the sum
+  $s_a + s_b$ is identified. This is the precise sense in which
+  attention weights on always-co-occurring instances are
+  uninterpretable: the framework reports that no method can split
+  their contributions from bag labels alone.
+\item The number of instance types $K$ exceeds the number of
+  distinct composition vectors observed.
+\item Two types are indistinguishable on the instance feature map,
+  in which case the framework correctly reports that they cannot be
+  separated.
+\end{itemize}
+
+\subsection{Continuous instance features}
+\label{sec:continuous}
+
+\Cref{thm:rank} extends cleanly to continuous instance features
+under a linear-in-features parametrization. Let $\bm\phi: \mathcal X
+\to \R^d$ be a feature map and write the per-instance log-survival
+$s(x; \bm\beta) = \bm\beta^\top \bm\phi(x)$ with $\bm\beta \in \R^d$
+constrained so that $\bm\beta^\top \bm\phi(x) \geq 0$ on the data
+support (equivalently $\eta(x) \in [0, 1)$). Under conditional
+independence of instance labels and the OR rule,
+\begin{equation}
+  \Prob\{Y_i = 0 \mid B_i\}
+   = \exp\!\big(-\bm\beta^\top \bm\Phi_i\big),
+   \qquad
+   \bm\Phi_i := \sum_{j \in B_i} \bm\phi(x_{ij}),
+   \label{eq:trans-cont-lik}
+\end{equation}
+so the bag likelihood depends on $\bm\beta$ only through the
+bag-by-feature matrix
+$\Phi = [\bm\Phi_1 \mid \cdots \mid \bm\Phi_N]^\top \in
+\R^{N \times d}_{\geq 0}$. This is the continuous-feature analogue
+of the discrete composition matrix $M$.
+
+\begin{theorem}[Identifiability with continuous instance features]
+\label{thm:rank-continuous}
+The parameter $\bm\beta$ is identifiable from bag labels
+$\{Y_i\}$ if and only if the bag-by-feature matrix $\Phi$ has full
+column rank $d$.
+\end{theorem}
+
+\begin{proof}[Sketch]
+The bag-label distribution depends on $\bm\beta$ only through the
+linear predictor $\Phi\bm\beta$, and the map $\sigma(S) = 1 - e^{-S}$
+is strictly increasing, so identifiability of $\bm\beta$ is
+equivalent to injectivity of $\bm\beta \mapsto \Phi\bm\beta$.
+Full proof in \cref{app:proof-cont-rank}.
+\end{proof}
+
+The discrete theorem is the special case $\bm\phi(x) =
+\bm e_{k(x)}$, for which $\bm\Phi_i = \bm m_i$ and $\Phi = M$.
+\Cref{thm:rank-continuous} thus reframes the discrete case as one
+choice of basis among many, and clarifies what to expect when
+$d > N$: the column rank cannot exceed $N$, $\bm\beta$ is then
+under-identified by $d - N$ dimensions, and bag-level predictions
+(which depend on $\bm\beta$ only through $\Phi\bm\beta$) remain
+well-defined on the unidentified null space.
+
+\Cref{thm:bag-total,thm:bias-rule} carry over verbatim with the
+substitutions $M \to \Phi$ and $\bm s \to \bm\beta$: the score
+equation becomes $\Phi^\top D^{-1}(\bm Y - \hat{\bm p}) = \bm 0$ at
+an interior MLE, and the aggregation-rule bias bound has the same
+implicit-function form with $\mathcal{I}(\bm\beta^*) =
+\Phi^\top D^{*-1} \Phi$ as the Fisher information at the truth.
+
+\subsection{Bag-prevalence consistency}
+
+\begin{theorem}[Bag-prevalence consistency]
+\label{thm:bag-total}
+Let $\hat{\bm{s}}$ be an \emph{interior} maximizer of the bag-OR
+likelihood \eqref{eq:trans-lik} (each $\hat s_k > 0$), with fitted
+bag-positive probabilities
+$\hat{p}_i = 1 - \exp(-\bm{m}_i^\top \hat{\bm{s}})$. Then the score
+equations give the IRLS-weighted moment-matching identity
+\begin{equation}
+  M^\top D^{-1}\,(\bm{Y} - \hat{\bm{p}}) = \bm{0},
+  \qquad D = \mathrm{diag}(\hat{p}_1, \ldots, \hat{p}_N),
+  \label{eq:bag-total}
+\end{equation}
+so along every direction in the column space of $M$ the fitted and
+observed bag-positive counts coincide \emph{up to inverse fitted-rate
+weighting}. Boundary maximizers ($\hat s_k = 0$ for some $k$) reduce
+the corresponding coordinate of \eqref{eq:bag-total} to a KKT
+inequality.
+\end{theorem}
+
+\begin{proof}[Sketch]
+Direct differentiation of $\log L(\bm s) = \sum_i [Y_i \log(1 - e^{-S_i})
++ (1-Y_i)(-S_i)]$, $S_i = \bm m_i^\top \bm s$, gives
+$\partial_{s_k}\log L = \sum_i m_{ik}(Y_i - p_i)/p_i$ at any interior
+point. Setting the score to zero yields \eqref{eq:bag-total}. At a
+boundary maximizer the KKT conditions hold with sign constraints on
+the inactive coordinates. Full proof in \cref{app:proof-bag-total};
+the apparatus parallels \cite[\S 3]{towell2026scrnacoarsening}.
+\end{proof}
+
+\begin{remark}
+The cloglog link $g(\mu) = \log(-\log(1-\mu))$ is \emph{not} the
+canonical link for the Bernoulli family (logit is). The unweighted
+moment identity $M^\top(\bm Y - \hat{\bm p}) = \bm 0$ holds for the
+logit GLM but not for the bag-OR likelihood. The IRLS weights
+$1/\hat p_i$ in \eqref{eq:bag-total} are exactly the variance-link
+factors that arise from the non-canonical link, and they cannot be
+removed by reparametrization without changing the model.
+\end{remark}
+
+\textbf{Practical implication.} A MIL model can match every IRLS-
+weighted aggregate bag statistic in $\mathrm{col}(M)$ while still
+distributing instance-level positivity mass arbitrarily within
+rank-deficient directions of $M$. Bag-level accuracy, AUC, and
+calibration curves therefore cannot detect instance-level
+mis-ranking. Diagnosing per-instance bias requires instance-level
+labels (singleton bags), an identified aggregation rule, or
+external priors. This is the MIL counterpart of cell-total
+consistency \citep{towell2026scrnacoarsening}, and it is the formal
+reason attention weights from a bag-trained model need independent
+instance-level validation before they are read as importances.

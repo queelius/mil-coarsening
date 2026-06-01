@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: article
+title: "Coarsening at random for multiple instance learning: identifiability conditions for instance-level inference"
+authors:
+  - family-names: Towell
+    given-names: Alexander
+    email: lex@metafunctor.com
+    orcid: "https://orcid.org/0000-0001-6443-9897"
+    affiliation: "Southern Illinois University Edwardsville"
+abstract: >-
+  Multiple instance learning (MIL) trains on bags of instances labelled only
+  at the bag level: a bag is positive when at least one of its instances is
+  positive, and the instance labels are latent. We show that MIL is an
+  instance of the masked-data identifiability problem from reliability
+  statistics, with instances acting as components, bags as candidate sets,
+  the logical-OR bag rule as series aggregation, and singleton bags
+  (instance-level labels) as singleton candidate sets that restore
+  identifiability. We establish a rank condition for identifiability of
+  instance-type positivity and its continuous-feature extension, a
+  bag-prevalence consistency theorem, and a first-order bias bound under
+  aggregation-rule misspecification. A confound between intrinsic instance
+  positivity and the noisy-OR firing rate is identified as the discrete-label
+  analogue of the spike-in capture-efficiency gap in scRNA-seq. Simulation
+  and an application to the MUSK benchmarks confirm the theory.
+keywords:
+  - masked data
+  - coarsening at random
+  - multiple instance learning
+  - weak supervision
+  - noisy-OR
+  - partial-label learning
+  - MUSK
+  - identifiability
+license: CC-BY-4.0
+repository-code: "https://github.com/queelius/mil-coarsening"
