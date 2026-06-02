@@ -1,8 +1,22 @@
 # Hand-off: mil-coarsening paper
 
-**Last touched**: 2026-05-21. Initial scaffold v0.1.
-Conference-format draft, em-dash free. Run `make paper` to confirm
-the build.
+**Last touched**: 2026-06-02. JMLR-format draft, 20pp, em-dash free.
+Run `make paper` to confirm the build.
+
+## Publication state (2026-06-02)
+- **git**: private repo at github.com/queelius/mil-coarsening
+  (initial commit 9f39e2c on branch master). Flip to public at
+  JMLR-submission time.
+- **Zenodo**: DRAFT deposition 20502965, reserved DOI
+  **10.5281/zenodo.20502965**. NOT YET PUBLISHED, matching every
+  other paper in the series (all currently drafts). Do not publish
+  MIL before the foundational `masked-causes` paper it cites is
+  published, or its live record will point at not-yet-live sibling
+  DOIs. Review draft: https://zenodo.org/deposit/20502965
+- When ready to publish series-wide, the dependency order is:
+  masked-causes and mdrelax first (foundational), then the six
+  application papers (scrna, spatial, mil, dp, weaksup, phenotype),
+  whose bibs cross-cite each other's reserved DOIs.
 
 This is the third application paper in the masked-data coarsening
 series, after `~/github/papers/scrna-coarsening/` (precursor) and
