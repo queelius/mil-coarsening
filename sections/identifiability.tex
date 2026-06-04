@@ -27,8 +27,9 @@ $\bm{s} + t\bm{v}$ stays in the nonnegative orthant, $M(\bm{s} +
 t\bm{v}) = M\bm{s}$, so $\bm{s}$ and $\bm{s} + t\bm{v}$ induce
 identical bag-label distributions for distinct $\bm{\eta}$.
 Sufficiency: full column rank makes $\bm{s} \mapsto M\bm{s}$
-injective. The bag labels then form a complementary-log-log-link
-Bernoulli GLM with design $M$; the linear predictor, hence $\bm{s}$,
+injective. The bag labels then form a Bernoulli GLM with the
+log-survival link $g(\mu) = -\log(1-\mu)$ and design $M$; the linear
+predictor, hence $\bm{s}$,
 hence $\bm{\eta}$, is identified by standard GLM regularity. Full
 proof in \cref{app:proof-rank}.
 \end{proof}
@@ -169,13 +170,18 @@ the apparatus parallels \cite[\S 3]{towell2026scrnacoarsening}.
 \end{proof}
 
 \begin{remark}
-The cloglog link $g(\mu) = \log(-\log(1-\mu))$ is \emph{not} the
-canonical link for the Bernoulli family (logit is). The unweighted
-moment identity $M^\top(\bm Y - \hat{\bm p}) = \bm 0$ holds for the
-logit GLM but not for the bag-OR likelihood. The IRLS weights
-$1/\hat p_i$ in \eqref{eq:bag-total} are exactly the variance-link
-factors that arise from the non-canonical link, and they cannot be
-removed by reparametrization without changing the model.
+The bag-OR model $p = 1 - e^{-\bm m^\top \bm s}$ uses the
+log-survival (negative-log-complement) link $g(\mu) = -\log(1-\mu)$,
+which is linear in $\bm s$. This is \emph{not} the canonical link
+for the Bernoulli family (logit is), nor is it the
+complementary-log-log link $\log(-\log(1-\mu))$; it is the link that
+makes the bag-level log-survival additive in the instance
+contributions. The unweighted moment identity $M^\top(\bm Y -
+\hat{\bm p}) = \bm 0$ holds for the canonical logit GLM but not for
+this model. The IRLS weights $1/\hat p_i$ in \eqref{eq:bag-total}
+are exactly the variance-link factors arising from the
+non-canonical link, and cannot be removed by reparametrization
+without changing the model.
 \end{remark}
 
 \textbf{Practical implication.} A MIL model can match every IRLS-

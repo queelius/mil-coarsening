@@ -36,7 +36,8 @@ likelihood
 \end{equation}
 Equation \eqref{eq:trans-lik} says the negative-log-probability of a
 negative bag is \emph{additive} in instance contributions: bag
-labels follow a Bernoulli model with complementary-log-log link and
+labels follow a Bernoulli model with log-survival link
+$g(\mu) = -\log(1-\mu)$ and
 linear predictor $\bm{m}_i^\top \bm{s}$.
 
 \subsection{The translation}

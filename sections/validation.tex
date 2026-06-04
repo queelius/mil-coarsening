@@ -103,7 +103,7 @@ median $4.66$ (IQR $[4.32, 4.93]$), with per-seed maximum at median
 $11.5$ (IQR $[10.3, 12.6]$): the unweighted moment-matching
 identity is \emph{not} satisfied, by seven orders of magnitude
 relative to the weighted form. This empirical contrast is the
-practical reason the cloglog-link non-canonicity in the remark
+practical reason the log-survival-link non-canonicity in the remark
 following \cref{thm:bag-total} matters.
 
 \paragraph{Boundary MLEs.} Boundary replicates have weighted
@@ -208,15 +208,23 @@ KKT-regime signature of \cref{thm:bag-total} on real data.}
 \label{fig:musk-eta}
 \end{figure}
 
-\paragraph{Bag-prevalence consistency, real data.} The fitted
-bag-positive rate $\bar{\hat p}$ matches the observed bag-positive
-rate $\bar Y$ to $0.03$ on MUSK1 ($\bar{\hat p} = 0.49$ vs.
-$\bar Y = 0.51$) and to $0.13$ on MUSK2 ($0.25$ vs. $0.38$). The
-MUSK2 gap is the boundary-coordinate signature of
-\cref{thm:bag-total}: at the KKT optimum the column-space moment
-identity holds for interior coordinates, while the constrained
-coordinates carry a residual that the unweighted bag rate
-inherits.
+\paragraph{Bag-prevalence consistency, real data.} \Cref{thm:bag-total}
+is an \emph{interior}-MLE identity (the weighted score $M^\top
+D^{-1}(\bm Y - \hat{\bm p}) = \bm 0$), so it constrains the fit only
+where coordinates of $\hat{\bm s}$ are interior. On MUSK the fit is
+dominated by the boundary: only $8$ of $20$ instance types on MUSK1
+and $4$ of $20$ on MUSK2 are interior at the optimum, and
+accordingly the weighted score residual is large
+($\|M^\top D^{-1}(\bm Y - \hat{\bm p})\|_\infty = 24.8$ on MUSK1 and
+$505$ on MUSK2), exactly because the KKT conditions, not the
+interior identity, govern the constrained coordinates. The theorem
+is therefore mostly \emph{inapplicable} on these heavily-boundary
+fits rather than confirmed by them; the simulation of
+\cref{sec:validation} is where the interior identity is verified
+cleanly. As a separate and coarser observation, the overall fitted
+bag-positive rate still tracks the observed rate ($\bar{\hat p} =
+0.49$ vs. $\bar Y = 0.51$ on MUSK1; $0.24$ vs. $0.38$ on MUSK2),
+the larger MUSK2 gap reflecting the same boundary dominance.
 
 \paragraph{Bag-level prediction.} Under leave-one-bag-out
 cross-validation (a fresh $k$-means on each held-in fold), the
@@ -278,9 +286,12 @@ discretization cost discussed in the prediction paragraph.}
 discrete-K results are not a competitive prediction benchmark.
 They show that (i) the rank-condition diagnostic computes cleanly
 on real chemical-descriptor data and rules out co-occurrence
-confound; (ii) the bag-prevalence consistency theorem produces the
-observed bag-rate to within the boundary-coordinate residual the
-theorem itself predicts; (iii) the interior-versus-boundary MLE
+confound; (ii) real chemical-descriptor data drive the bag-OR MLE
+into the boundary regime (most instance types inactive at the
+optimum), so \cref{thm:bag-total}'s interior identity is largely
+inapplicable here and the clean confirmation lives in the
+simulation, a distinction the framework makes explicit;
+(iii) the interior-versus-boundary MLE
 classification from \cref{sec:validation}'s simulation survives the
 transition to real data; and (iv) the discrete-type framework's
 predictive ceiling on continuous-feature chemistry data is real

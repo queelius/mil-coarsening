@@ -51,9 +51,13 @@ establish identifiability:
 
 \begin{theorem}[Identifiability under C1--C2--C3]
 \label{thm:bg-id}
-Under \cref{cond:c1,cond:c2,cond:c3} and standard regularity,
-$\theta$ is identifiable iff the augmented candidate-set matrix
-$\tilde{C} \in \{0,1\}^{n \times m}$ has full column rank $m$.
+Under \cref{cond:c1,cond:c2,cond:c3} and standard regularity, full
+column rank $m$ of the augmented candidate-set matrix $\tilde{C}
+\in \{0,1\}^{n \times m}$ is \emph{sufficient} for $\theta$ to be
+identifiable. Separability is necessary but not in general
+sufficient (a separating mechanism can leave $\tilde{C}$
+rank-deficient, e.g. $m=4$ with candidate sets
+$\{1,2\},\{3,4\},\{1,3\},\{2,4\}$).
 \end{theorem}
 
 \emph{Singleton} candidate sets ($|c_i|=1$) are critical: each

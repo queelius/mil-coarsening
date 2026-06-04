@@ -52,7 +52,7 @@ $\bm \eta'$ differ, so $\bm \eta$ is not identifiable.
 The two directions combine to give the iff statement. \qedhere
 \end{proof}
 
-The proof reveals that the identifying structure is the cloglog
+The proof reveals that the identifying structure is the log-survival
 linear-predictor map $\bm s \mapsto M\bm s$. This linearity is
 what makes the continuous-feature extension of \cref{sec:continuous}
 clean: replacing $M$ with the bag-summed feature matrix $\Phi$
@@ -215,23 +215,34 @@ $\Prob_\epsilon\{Y = 1 \mid \bm m\} = 1 - \prod_k (1 - (1-\epsilon)
 $s_k^*(\epsilon) = -\log(1 - (1-\epsilon)\eta_k)$. Differentiating
 at $\epsilon = 0$,
 $\partial_\epsilon s_k^*(0) = -\eta_k / (1 - \eta_k) = -(e^{s_k^*} -
-1)$, so
-$\E_\epsilon[Y_i] - p_i^*
-= -(1 - p_i^*)\,\bm m_i^\top \dot{\bm s}\,\epsilon
-+ O(\epsilon^2)$
-with $\dot s_k = -(e^{s_k^*} - 1)$ and
-$p_i^* = 1 - e^{-\bm m_i^\top \bm s^*}$. The score sensitivity is
+1)$, so, writing $\dot s_k = \partial_\epsilon s_k^*(0) =
+-(e^{s_k^*} - 1)$ and $p_i^* = 1 - e^{-\bm m_i^\top \bm s^*}$,
+direct differentiation of
+$\Prob_\epsilon\{Y_i = 1 \mid \bm m_i\} = 1 - e^{-\bm m_i^\top \bm
+s^*(\epsilon)}$ gives
+\begin{equation}
+  \E_\epsilon[Y_i] - p_i^*
+  = (1 - p_i^*)\,(\bm m_i^\top \dot{\bm s})\,\epsilon
+  + O(\epsilon^2).
+  \label{eq:app-noisy-or-EY}
+\end{equation}
+Because every $\dot s_k < 0$, the leading term is negative: a
+positive firing-rate deficit $\epsilon$ lowers the bag-positive
+probability, as it must. The corresponding score sensitivity is
 \begin{equation}
   \big[\partial_\epsilon g(\bm s^*, 0)\big]_k
-  \;=\; -\sum_i m_{ik}\,\frac{1 - p_i^*}{p_i^*}\,
+  \;=\; \sum_i m_{ik}\,\frac{1 - p_i^*}{p_i^*}\,
          \bm m_i^\top \dot{\bm s}.
   \label{eq:app-noisy-or-sens}
 \end{equation}
 At small $\epsilon$ this matches the empirical observation
 $\hat\eta_k / \eta_k \approx \rho = 1 - \epsilon$ from
-\cref{fig:firing-rate}: the bias rotates $\hat{\bm s}$ along the
-direction $\dot{\bm s}$ that corresponds to a multiplicative
-rescaling of $\bm\eta$ by $\rho$.
+\cref{fig:firing-rate}: the bias rescales $\hat{\bm s}$ along the
+direction $\dot{\bm s}$ corresponding to a multiplicative shrinkage
+of $\bm\eta$ by $\rho$. (The sign in \eqref{eq:app-noisy-or-EY} is
+verified by finite differences in \texttt{scripts/}; an earlier
+draft carried the opposite sign in this expansion only, with the
+simulation and figures unaffected.)
 
 The label-noise and threshold cases produce analogous sensitivities;
 their derivations are parallel and are omitted.
