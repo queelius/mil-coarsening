@@ -56,6 +56,8 @@ make clean      # removes build artifacts
 
 ## Status
 
+**Reviewed 2026-06-08 (papermill multi-agent): minor-revision.** No critical issues; all proofs re-derived clean and the result is now folded into the synthesis as cor:mil. (The simulation and MUSK1/MUSK2 application are in fact done, despite the note below; this README is being refreshed.) Top remaining item: fix four MUSK numbers in sections/validation.tex (lines 215-219) that contradict the deposited results file (interior counts 8/4 should be 9/3; residuals 24.8/505 should be 26/~612), and switch the hardcoded appendix theorem numbers to cref.
+
 Initial scaffold. Theorem statements and proof sketches in place;
 simulation code, real-data application, and figures pending. See
 `HANDOFF.md`.
