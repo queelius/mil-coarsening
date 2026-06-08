@@ -104,6 +104,18 @@ max-margin instance classifier. The OR constraint is exactly C1;
 the imputation step is a hard-assignment surrogate for the
 candidate-set sum.
 
+\paragraph{milr \citep{chen2017milr}} is the closest prior
+likelihood model: it treats the latent instance labels as missing
+Bernoulli data under the OR rule and fits a logistic instance model
+by expectation-maximization with a lasso penalty. It is the
+soft-assignment (full likelihood) counterpart to mi-SVM. Our
+\eqref{eq:trans-lik} is the same OR-link Bernoulli likelihood written
+in the log-survival parametrization; what we add on top of the milr
+estimator is the identifiability layer, the rank condition of
+\cref{sec:identifiability} and the bag-prevalence identity, which
+governs when its EM fit recovers instance-type positivity rather than
+merely a bag-consistent fit.
+
 \paragraph{Attention-based deep MIL \citep{ilse2018attention}} pools
 instance embeddings with learned attention weights. The attention
 weights are commonly read as instance importances; the rank

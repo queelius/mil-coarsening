@@ -189,7 +189,13 @@ weighted aggregate bag statistic in $\mathrm{col}(M)$ while still
 distributing instance-level positivity mass arbitrarily within
 rank-deficient directions of $M$. Bag-level accuracy, AUC, and
 calibration curves therefore cannot detect instance-level
-mis-ranking. Diagnosing per-instance bias requires instance-level
+mis-ranking. This gives a likelihood-level mechanism for the
+empirical bag-versus-instance accuracy gap documented by
+\citet{vanwinckelen2016instance}: where they observe that bag-level
+performance need not transfer to instances, \eqref{eq:bag-total}
+identifies the rank-deficient directions of $M$ as exactly the
+subspace in which instance mass is unconstrained by the bag
+likelihood. Diagnosing per-instance bias requires instance-level
 labels (singleton bags), an identified aggregation rule, or
 external priors. This is the MIL counterpart of cell-total
 consistency \citep{towell2026scrnacoarsening}, and it is the formal

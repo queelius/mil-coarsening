@@ -85,10 +85,13 @@ Multiple instance learning (MIL) trains on \emph{bags} of instances
 labelled only at the bag level: a bag is positive when at least one
 of its instances is positive, and the instance labels are latent.
 Methods such as mi-SVM, Diverse Density, and attention-based deep MIL
-recover instance-level structure, but the conditions under which
-instance-level inference is identifiable from bag labels have not
-been characterized. We show that MIL is an instance of the
-masked-data identifiability problem from reliability statistics:
+recover instance-level structure, and instance-level learnability has
+recently been studied through PAC theory \citep{jang2024learnable}. We
+give the reliability-theoretic instance of this question: we cast MIL
+as the masked-data identifiability problem from reliability statistics
+and read off the conditions under which instance-level inference is
+identifiable from bag labels. Concretely, MIL is an instance of the
+masked-data identifiability problem:
 instances are components, bags are candidate sets, the ``at least
 one positive instance'' rule is series (logical-OR) aggregation, and
 singleton bags (instance-level labels) are singleton candidate sets

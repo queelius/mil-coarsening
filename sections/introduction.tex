@@ -23,19 +23,36 @@ A large methods literature attacks MIL: axis-parallel rectangles
 \citep{ilse2018attention}, with problem variants surveyed by
 \citet{carbonneau2018multiple} and \citet{foulds2010review}. These
 methods differ in how they parametrize the instance-to-bag relation
-and how they pool instance evidence. None, however, characterizes
-\emph{when} the instance-level classifier is identifiable from bag
-labels alone, what auxiliary information restores identifiability
-when it fails, or what bias is incurred when the bag-formation
-assumption is wrong. Practical questions go unanswered: when are
-attention weights interpretable as instance scores? When does a MIL
-model that predicts bag labels well still mis-rank instances? How
-many instance-level labels are needed to calibrate a bag-trained
-model? The nearest existing identifiability-flavored line is
-partial-label learning \citep{cour2011learning}, in which each
+and how they pool instance evidence. The gap between bag-level and
+instance-level success is itself well documented:
+\citet{vanwinckelen2016instance} show empirically that strong
+bag-level accuracy need not transfer to instance-level accuracy, and
+\citet{jang2024learnable} give a PAC account of when deep-MIL
+algorithms are instance-level learnable. What these accounts do not
+supply, and what we add, is a likelihood-identifiability reading in
+the reliability (masked-cause / series-system) idiom: a closed-form
+rank condition on the bag composition matrix that says \emph{when}
+instance-type positivity is identifiable from bag labels alone, an OR-link
+bag-prevalence identity that makes the bag-versus-instance gap of
+\citet{vanwinckelen2016instance} a moment-matching statement, what
+auxiliary information restores identifiability when the rank condition
+fails, and what bias is incurred when the bag-formation assumption is
+wrong. Practical questions follow: when are attention weights
+interpretable as instance scores? When does a MIL model that predicts
+bag labels well still mis-rank instances? How many instance-level
+labels are needed to calibrate a bag-trained model? The closest prior
+likelihood model is the EM treatment of MIL as Bernoulli MLE with
+latent instance labels under the OR rule
+\citep{chen2017milr}, which fits a logistic instance model by
+expectation-maximization but does not give identifiability conditions
+or a rank diagnostic; the closest identifiability-flavored neighbour
+is partial-label learning \citep{cour2011learning}, in which each
 \emph{instance} carries a candidate \emph{label} set with one
-correct label; MIL is the dual coarsening, in which a candidate
-\emph{instance} set (the bag) carries one observed label.
+correct label, with MIL the dual coarsening in which a candidate
+\emph{instance} set (the bag) carries one observed label. Both sit
+inside the general coarse-data maximum-likelihood theory of
+\citet{couso2017coarse}, of which the masked-cause specialization used
+here is one case.
 
 \subsection{The bridge to masked-data inference}
 
