@@ -106,10 +106,13 @@ Recognition) work against it, while two venues whose criteria fit this profile r
   version in third person.
 - **Publication ordering (now satisfied on the blocking axis)**: foundational `masked-causes`
   is LIVE (Zenodo 10.5281/zenodo.20457290, concept 18725577), so the concept-DOI sibling cites
-  resolve and MIL is unblocked. Still clear the pre-deposit review items before publishing: the
-  four MUSK numbers (MET-1; reportedly fixed, re-verify against `data/musk_results.rds`), the
-  appendix theorem numbers (FMT-1), and the three stale self-cites (CIT-1). At acceptance,
-  deposit the accepted version as a NEW VERSION under the existing concept DOI (10.5281/zenodo.20502964).
+  resolve and MIL is unblocked. The three pre-deposit review items are now VERIFIED cleared
+  (2026-06-09): the MUSK numbers (MET-1) match `data/musk_results.rds` (interior 9/3, boundary
+  11/17, residuals 26/612), the appendix proof titles use `\cref` not literal numbers (FMT-1),
+  and the three self-cites carry their canonical concept DOIs (CIT-1: masked 18725577, scrna
+  20414734, spatial 20422883). Remaining pre-deposit work is the minors only (Doran-Ray cite,
+  etc.). At acceptance, deposit the accepted version as a NEW VERSION under the existing concept
+  DOI (10.5281/zenodo.20502964).
 
 ## Structure
 
@@ -173,11 +176,15 @@ Notable minors: Doran-Ray 2014 (nearest MIL-identifiability prior) uncited (NOV-
 ## Publication / deposit state
 
 - git: private repo github.com/queelius/mil-coarsening (flip public at submission).
-- Zenodo: DRAFT deposition 20502965, reserved DOI 10.5281/zenodo.20502965. NOT published. Per HANDOFF, do not publish before foundational `masked-causes` is live. Fix MET-1, FMT-1, and CIT-1 before any deposit/publish.
+- Zenodo: DRAFT deposition 20502965, reserved DOI 10.5281/zenodo.20502965. NOT published. `masked-causes` is now live (10.5281/zenodo.20457290), so the ordering constraint is satisfied. MET-1/FMT-1/CIT-1 verified cleared 2026-06-09; remaining pre-deposit work is the minors (Doran-Ray cite and the small prose items).
 
 ## Next action
 
-1. Fix the four MUSK numbers (MET-1) and the appendix theorem numbers (FMT-1): both are quick, both are pre-deposit blockers for credibility.
-2. Add Doran-Ray 2014 and update the three stale self-cites to their Zenodo DOIs.
+1. DONE (verified 2026-06-09): MET-1 (MUSK numbers vs the RDS), FMT-1 (appendix `\cref`), and
+   CIT-1 (self-cite concept DOIs) are all cleared; build clean (22 pages, 0 undefined).
+2. Add Doran-Ray 2014 (nearest MIL-identifiability prior; CIT-2/NOV-1).
 3. Sweep the remaining minors (isomorphic, three-vs-four, empty-bag clause, threshold-r framing, cite->citet).
-4. Update CLAUDE.md/README venue/length metadata to the journal-length reality.
+4. Decide venue (TMLR primary vs JMLR) and prepare accordingly: TMLR wants ~12pp main with
+   proofs in the uncapped appendix (trim); JMLR keeps all 22pp but needs the JMLR style file.
+5. Update CLAUDE.md/README venue/length metadata to the journal-length reality (CLAUDE.md still
+   says "conference ~12 pages").
