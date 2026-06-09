@@ -56,16 +56,60 @@ Multiple instance learning (MIL) is an instance of the masked-data series-system
 
 ## Venue
 
-**Stage**: venue not locked. HANDOFF positions this as a JMLR-format draft. The paper has outgrown the original ~12-page conference target (now 22 pages, journal-length).
+**Analyzed 2026-06-09** (web-verified). The decisive fact is that this paper is a
+*correct-and-useful but non-novel-algorithm, non-SOTA, journal-length theory+diagnostic*
+contribution: it proposes no new estimator and does not try to beat baselines. That reorders
+the usual ML ladder, the novelty/impact-weighted venues (NeurIPS/ICML/ICLR, TPAMI, Pattern
+Recognition) work against it, while two venues whose criteria fit this profile rise to the top.
 
-### Candidates
-1. **JMLR** (primary per HANDOFF). Fits a theory-plus-empirical identifiability paper; no hard page cap.
-2. **AISTATS / ICML / NeurIPS** (conference). Would require trimming to the page cap (move MUSK or PLL to supplementary, per HANDOFF options).
-3. **A weakly-supervised-learning or medical-imaging venue** (if the computational-pathology angle is led; would need the deferred pathology experiment).
+### Candidates (ranked)
+1. **TMLR (Transactions on Machine Learning Research)** -- PRIMARY. Its acceptance criteria
+   explicitly forbid rejecting work for being "not novel enough" or for not topping a
+   benchmark, and name diagnostic/robustness studies as in-scope, removing this paper's single
+   largest rejection risk. Full OA, no APC, ~9-week rolling review, preprint-friendly (double-blind on
+   OpenReview with a de-anonymization option in the style file for the Zenodo preprint).
+   Friction: the fast track wants ~12pp of main content; either trim main toward 12pp with
+   proofs in the uncapped appendix, or accept a slower review at the current 22pp.
+2. **JMLR** -- calibrated/no-trim alternative. This is original research (a new analytical
+   framework), so the "surveys by invitation only" rule does NOT apply. No page cap (keep all
+   22pp + proofs intact), no fees, CC-BY, preprints allowed, highest ML-journal prestige, and
+   JMLR is AISTATS Journal-to-Conference eligible (can later be presented as an AISTATS poster;
+   TMLR is not yet on that list). Trade: slower/higher-bar review + mandatory JMLR-style
+   reformat from the article class.
+3. **AISTATS 2027** (conference, if a hard deadline + visibility is wanted). Abstract
+   ~Jan 15, 2027; Paris, Apr 26-28, 2027 (re-verify on the official site near Dec 2026). Needs
+   heavy compression: 22pp -> ~8-9pp main + supplement (keep the MIL-as-masked-data reduction,
+   the rank diagnostic as headline, one MUSK demonstration; appendix the rest). Novelty IS
+   weighed, so frame the structural reduction + the practitioner diagnostic as the novel
+   object. **UAI 2027** (~Feb 2027, unofficial; July 2027) is the better topical fit
+   (uncertainty/identifiability) on the same compression terms.
+
+### Excluded
+- **NeurIPS / ICML / ICLR**: strongest novelty/impact weighting + 8-9pp compression; high-risk
+  for a deliberately non-novel diagnostic. TMLR is the JMLR-family route built precisely so such
+  work need not fight that bar.
+- **IEEE TPAMI / Pattern Recognition**: vision/empirical, novelty-driven, two-column page caps,
+  reformat; PR charges ~USD 2,800 APC for OA. Poor fit for a non-SOTA identifiability paper.
+- **Weakly-supervised / computational-pathology venue**: deferred, not now. Relevant only if a
+  pathology (e.g., WSI/TCGA) experiment is added; the paper currently defers that.
 
 ### Submission strategy
-- The series publication order (HANDOFF): publish foundational `masked-causes` and `mdrelax` first, then the application papers, because the bibs cross-cite reserved/concept DOIs. Do not publish MIL before `masked-causes` is live or the record points at not-yet-live sibling DOIs.
-- Before deposit: fix the four MUSK numbers (review MET-1) and the appendix theorem numbers (review FMT-1); update the three stale self-cites to their Zenodo DOIs (review CIT-1).
+- **Primary path: TMLR.** If trimming main to ~12pp feels like too much surgery on a
+  proof-bearing paper, go to **JMLR** instead (no page cap, keep everything; slower, higher bar,
+  JtC bonus).
+- **Never run a journal and a conference submission concurrently.** Conferences bar work under
+  review at another refereed-proceedings venue; a Zenodo preprint does NOT trip this, but a live
+  TMLR/JMLR review does. Pick one track at a time. The clean combo for both a journal of record
+  and conference visibility: publish in JMLR first, then use the AISTATS Journal-to-Conference
+  track.
+- **Conference anonymity**: do not deanonymize via "our prior preprint"; cite the Zenodo
+  version in third person.
+- **Publication ordering (now satisfied on the blocking axis)**: foundational `masked-causes`
+  is LIVE (Zenodo 10.5281/zenodo.20457290, concept 18725577), so the concept-DOI sibling cites
+  resolve and MIL is unblocked. Still clear the pre-deposit review items before publishing: the
+  four MUSK numbers (MET-1; reportedly fixed, re-verify against `data/musk_results.rds`), the
+  appendix theorem numbers (FMT-1), and the three stale self-cites (CIT-1). At acceptance,
+  deposit the accepted version as a NEW VERSION under the existing concept DOI (10.5281/zenodo.20502964).
 
 ## Structure
 
