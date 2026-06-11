@@ -96,16 +96,24 @@ sensitivity is also worked out in closed form.
 \citet{foulds2010review} organize MIL methods by their bag
 assumption: the \emph{standard} assumption is exactly deterministic
 OR, while \emph{collective} assumptions let the bag label depend on
-the proportion or count of positive instances. In our framework this
-taxonomy has a one-line characterization. The standard assumption is
-the regime in which C1 holds with probability one: a positive bag
-contains an individually positive instance. Collective assumptions
-violate C1, because a bag can be ``positive'' with no individually
-positive instance (a threshold rule with $r > 1$, or a
-proportion rule). \Cref{thm:bias-rule} then states that the bias of
-a standard-assumption estimator applied to collective-assumption
-data is first-order in the size of the C1 violation
-$\bm{\epsilon}$, and zero precisely when C1 holds. The
+the proportion or count of positive instances. In our framework these
+departures from deterministic OR fall into two tiers. The standard
+assumption is the regime in which the single-cause OR structure holds:
+a positive bag is positive by virtue of one individually positive
+instance, and C1 holds with probability one. Threshold, count, and
+proportion rules \emph{preserve} C1, since a positive bag still
+contains individually positive instances, but they break the
+single-cause structure: the masked ``cause'' becomes a subset of
+instances rather than a single one, so the deterministic-OR likelihood
+is misspecified even though its support condition is intact. Emergent
+(relational) rules, in which bag positivity is a collective property
+with no individually positive instance, \emph{violate} C1 outright.
+\Cref{thm:bias-rule} covers both tiers: it bounds the bias of the
+deterministic-OR estimator under any smooth departure $\bm{\epsilon}$
+from the OR rule, first-order in $\bm{\epsilon}$ and zero precisely at
+$\bm{\epsilon} = \bm{0}$, whether that departure preserves C1
+(threshold, count, proportion) or violates it (emergent). The
 \citet{foulds2010review} taxonomy is, in this framework, a
-partition of aggregation rules by whether they preserve C1, and the
-bias bound quantifies the cost of crossing the partition.
+classification of how aggregation rules depart from the single-cause
+OR structure, and the bias bound quantifies the cost of each
+departure.
