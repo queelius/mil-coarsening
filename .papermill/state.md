@@ -1,12 +1,15 @@
 ---
 schema_version: 1
-last_updated: 2026-06-08
-stage: revised-post-review-v0.3
+last_updated: 2026-06-10
+stage: tmlr-ready (blocked on OpenReview profile)
 paper_type: theory-with-simulation-and-real-data
 format: latex
 build_command: make paper
 main_file: main.tex
 output_file: main.pdf
+tmlr_build: main-tmlr.tex (anonymized, double-blind; tmlr.sty vendored); build clean, 19pp
+submission_blocker: "no OpenReview profile yet (moderated signup required; cannot be created by the assistant). Once it exists, drive the OpenReview submission and stop before final submit."
+last_review: ".papermill/reviews/2026-06-10/review.md (accept-with-one-fix; M-C1 applied 2026-06-10, commit 072458d)"
 ---
 
 # Paper state: mil-coarsening
